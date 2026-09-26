@@ -1,0 +1,33 @@
+-- ==========================================
+-- SCRIPT LOADER TỪ XA (REMOTE SCRIPT LOADER)
+-- ==========================================
+
+local function loadRemoteScript()
+    -- Dán đường dẫn Raw GitHub hoặc link Pastebin của bạn vào đây
+    local url = "https://raw.githubusercontent.com/TênTàiKhoản/TênRepo/main/main.lua"
+    
+    gg.toast("Đang kết nối tới server để tải kịch bản...")
+    
+    -- Gửi yêu cầu HTTP GET để lấy nội dung từ xa
+    local response = gg.makeRequest(url)
+    
+    if not response or not response.content then
+        gg.alert("❌ Không thể kết nối tới server! Vui lòng kiểm tra lại kết nối mạng.")
+        return
+    end
+    
+    local remoteCode = response.content
+    
+    -- Biên dịch đoạn code vừa tải về bộ nhớ RAM
+    local chunk, err = load(remoteCode) or loadstring(remoteCode)
+    if not chunk then
+        gg.alert("❌ Lỗi biên dịch code từ server:\n" .. tostring(err))
+        return
+    end
+    
+    -- Thực thi script
+    return chunk()
+end
+
+-- Chạy loader
+loadRemoteScript()
