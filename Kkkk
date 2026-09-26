@@ -1,0 +1,28 @@
+-- ==========================================
+-- ==========================================
+
+local function loadFromGitHub()
+    -- Đã thay mã commit bằng nhánh 'main' để luôn tự động cập nhật bản mới nhất
+    local url = "https://raw.githubusercontent.com/anhdepzaihub/M-ho-file/main/M%C3%A3%20ho%C3%A1.lua"
+    
+    gg.toast("Đang tải kịch bản mới nhất từ GitHub...")
+    
+    local response = gg.makeRequest(url)
+    
+    if not response or not response.content then
+        gg.alert("❌ Không thể kết nối tới GitHub! Vui lòng kiểm tra lại kết nối mạng.")
+        return
+    end
+    
+    local remoteCode = response.content
+    
+    local chunk, err = load(remoteCode) or loadstring(remoteCode)
+    if not chunk then
+        gg.alert("❌ Lỗi biên dịch code từ GitHub:\n" .. tostring(err))
+        return
+    end
+    
+    return chunk()
+end
+
+loadFromGitHub()
