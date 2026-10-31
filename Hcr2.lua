@@ -1279,6 +1279,52 @@ local function vipPassFunc()
 end
 
 -- ═══════════════════════════════════════════════════════════
+--  FAKE VIP MODIFICATION (MỚI)
+-- ═══════════════════════════════════════════════════════════
+local fakeVIPState = false
+local fakeVIPBackup = nil
+
+local function FakeVIPModification()
+    local choice = gg.choice({
+        "🟢 Bật Fake VIP",
+        "🔴 Tắt Fake VIP",
+        "⬅️ Quay lại"
+    }, nil, "Trạng thái: " .. (fakeVIPState and "🟢 ON" or "🔴 OFF") ..
+        "\n💡 Vào Shop / tab VIP trong game trước khi bật!")
+
+    if not choice or choice == 3 then return MainMenu() end
+
+    if choice == 1 then
+        if fakeVIPState then gg.toast("✅ Đã bật rồi!"); return FakeVIPModification() end
+        gg.clearResults()
+        gg.setRanges(gg.REGION_C_BSS)   -- range 8
+        gg.searchNumber("960541288;1895825695;446629856::21", gg.TYPE_DWORD)
+        gg.refineNumber("1895825695", gg.TYPE_DWORD)
+        local cnt = gg.getResultCount()
+        if cnt == 0 then
+            gg.alert("❌ Không tìm thấy!\n💡 Hãy vào Shop / VIP tab trong game rồi thử lại.")
+            gg.setRanges(RANGE_VALUE); gg.clearResults()
+            return FakeVIPModification()
+        end
+        local res = gg.getResults(math.min(cnt, 1000))
+        fakeVIPBackup = gg.getValues(res)
+        gg.editAll("1895826719", gg.TYPE_DWORD)
+        fakeVIPState = true
+        gg.clearResults()
+        gg.setRanges(RANGE_VALUE)
+        gg.toast("✅ Đã bật Fake VIP!")
+    elseif choice == 2 then
+        if not fakeVIPState or not fakeVIPBackup then
+            gg.alert("❌ Chưa bật!"); return FakeVIPModification()
+        end
+        gg.setValues(fakeVIPBackup)
+        fakeVIPState = false; fakeVIPBackup = nil
+        gg.toast("❌ Đã tắt Fake VIP!")
+    end
+    return FakeVIPModification()
+end
+
+-- ═══════════════════════════════════════════════════════════
 --  DIAMONDS (SR)
 -- ═══════════════════════════════════════════════════════════
 local SR = {}
@@ -1960,7 +2006,7 @@ local function About()
    ✈️ Telegram :: @Andepzai
    📺 Youtube  :: @Andepzai
 
-⚡ FEATURES (29):
+⚡ FEATURES (30):
    ✅ Auto Win (ARMV8)
    ✅ Fake Unlock
    ✅ Free Upgrade
@@ -1976,6 +2022,7 @@ local function About()
    ✅ Flat Ground for Adventure
    ✅ Debug Mode
    ✅ VIP Pass
+   ✅ Fake VIP Modification
    ✅ Diamonds (SR) + Bypass
    ✅ Max Vehicles
    ✅ Max Mastery
@@ -2018,6 +2065,7 @@ function MainMenu()
         "➖ Flat Ground for Adventure",
         "💎 Debug Mode",
         "⭐ VIP Pass",
+        "👑 Fake VIP Modification",
         "💎 Diamonds (SR) + Bypass",
         "🚀 Max Vehicles",
         "⭐ Max Mastery",
@@ -2050,20 +2098,21 @@ function MainMenu()
     elseif choice == 13 then flatGroundAdventure()
     elseif choice == 14 then debugMode()
     elseif choice == 15 then vipPassFunc()
-    elseif choice == 16 then diamondsSR()
-    elseif choice == 17 then MaxVehicles()
-    elseif choice == 18 then MaxMastery()
-    elseif choice == 19 then MaxParts()
-    elseif choice == 20 then SetFuelCoins()
-    elseif choice == 21 then TeamEventMenu()
-    elseif choice == 22 then EventMenu()
-    elseif choice == 23 then GameDataMenu()
-    elseif choice == 24 then VehicleSpeedMenu()
-    elseif choice == 25 then GlobalVisionMenu()
-    elseif choice == 26 then TerrainFlatMenu()
-    elseif choice == 27 then MapModificationArea()
-    elseif choice == 28 then About()
-    elseif choice == 29 then
+    elseif choice == 16 then FakeVIPModification()
+    elseif choice == 17 then diamondsSR()
+    elseif choice == 18 then MaxVehicles()
+    elseif choice == 19 then MaxMastery()
+    elseif choice == 20 then MaxParts()
+    elseif choice == 21 then SetFuelCoins()
+    elseif choice == 22 then TeamEventMenu()
+    elseif choice == 23 then EventMenu()
+    elseif choice == 24 then GameDataMenu()
+    elseif choice == 25 then VehicleSpeedMenu()
+    elseif choice == 26 then GlobalVisionMenu()
+    elseif choice == 27 then TerrainFlatMenu()
+    elseif choice == 28 then MapModificationArea()
+    elseif choice == 29 then About()
+    elseif choice == 30 then
         gg.setVisible(true)
         print(ShowPrint)
         os.exit()
