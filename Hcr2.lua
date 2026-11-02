@@ -5,7 +5,7 @@
 ║                                                              ║
 ║    📢 Discord  :: Andepzai DALI®                                   ║
 ║    📢 Telegram :: @Andepzai DALI®                                  ║
-║    📢 Youtube  :: @Andepza DALI®i                                  ║
+║    📢 Youtube  :: @Andepza DALI®                                  ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
@@ -1956,6 +1956,7 @@ local function About()
 ⚙️ GG: 101.1
 
 📢 Contact:
+   ✈️ Telegram : t.me/DALIXZUMA_ELITE  
    💬 Discord  :: Andepzai
    ✈️ Telegram :: @Andepzai
    📺 Youtube  :: @Andepzai
@@ -2088,7 +2089,7 @@ selectRange()
 gg.clearResults()
 gg.clearList()
 gg.setRanges(RANGE_VALUE)
-gg.toast("🚀 Starting AɴнDᴇᴘZᴀ+DALI®ı V3.2 ( Merged)...")
+gg.toast("🚀 Starting AɴнDᴇᴘZᴀ+DALI® V3.2 ( Merged)...")
 gg.sleep(800)
 
 if not findGameStatus() then
