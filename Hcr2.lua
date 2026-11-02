@@ -3,9 +3,9 @@
 ║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.2  ▓▓▓                   ║
 ║      HCR2 Cheat Menu         ║
 ║                                                              ║
-║    📢 Discord  :: Andepzai                                   ║
-║    📢 Telegram :: @Andepzai                                  ║
-║    📢 Youtube  :: @Andepzai                                  ║
+║    📢 Discord  :: Andepzai DALI®                                   ║
+║    📢 Telegram :: @Andepzai DALI®                                  ║
+║    📢 Youtube  :: @Andepza DALI®i                                  ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
@@ -17,9 +17,9 @@ local ShowPrint = [[
 ║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.2  ▓▓▓                   ║
 ║                  Thanks for using!                           ║
 ║                                                              ║
-║    📢 Discord  :: Andepzai                                   ║
-║    📢 Telegram :: @Andepzai                                  ║
-║    📢 Youtube  :: @Andepzai                                  ║
+║    📢 Discord  :: Andepzai DALI®                                   ║
+║    📢 Telegram :: @Andepzai DALI®                                  ║
+║    📢 Youtube  :: @Andepzai DALI®                                  ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
@@ -2088,7 +2088,7 @@ selectRange()
 gg.clearResults()
 gg.clearList()
 gg.setRanges(RANGE_VALUE)
-gg.toast("🚀 Starting AɴнDᴇᴘZᴀı V3.2 ( Merged)...")
+gg.toast("🚀 Starting AɴнDᴇᴘZᴀ+DALI®ı V3.2 ( Merged)...")
 gg.sleep(800)
 
 if not findGameStatus() then
