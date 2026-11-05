@@ -33,7 +33,7 @@ local BaseGameStatusRaw = nil
 local BaseRegion = nil
 
 -- ═══════════════════════════════════════════════════════════
---  YJ HELPERS (từ Android)
+--  YJ HELPERS
 -- ═══════════════════════════════════════════════════════════
 yj = {}
 function yj.getString(addr)
@@ -299,7 +299,7 @@ local function getOffsets()
 end
 
 -- ═══════════════════════════════════════════════════════════
---  VEHICLE SPEED (từ Android)
+--  VEHICLE SPEED
 -- ═══════════════════════════════════════════════════════════
 local Vehiclespeedchangeoffset = nil
 local Vehiclegearshiftvalue = nil
@@ -354,7 +354,7 @@ local function VehicleSpeedMenu()
 end
 
 -- ═══════════════════════════════════════════════════════════
---  GLOBAL VISION (từ Android)
+--  GLOBAL VISION
 -- ═══════════════════════════════════════════════════════════
 local Globalvisionoffset = nil
 local Globalvisionoffsetvalue = nil
@@ -405,7 +405,7 @@ local function GlobalVisionMenu()
 end
 
 -- ═══════════════════════════════════════════════════════════
---  TERRAIN FLAT (từ Android)
+--  TERRAIN FLAT
 -- ═══════════════════════════════════════════════════════════
 local TerrainFlatMenu
 
@@ -502,7 +502,7 @@ TerrainFlatMenu = function()
 end
 
 -- ═══════════════════════════════════════════════════════════
---  MAP MODIFICATION (từ Android)
+--  MAP MODIFICATION
 -- ═══════════════════════════════════════════════════════════
 local Allmappointersadd = nil
 local ListofallmapsnamesandaddressesOptionsData = nil
@@ -561,7 +561,6 @@ local function Allmapnamesandaddressesgenerationtable()
     return tbl
 end
 
--- Forward declarations
 local SingleMapModificationfunction
 local MapModificationArea
 
@@ -1421,7 +1420,7 @@ local function MaxMastery()
         writes[#writes + 1] = {address = entry.vehiclePtr + 0x130, flags = gg.TYPE_DWORD, value = 4}
         successCount = successCount + 1
     end
-        if #writes > 0 then gg.setValues(writes); gg.alert("✅ Đã max " .. successCount .. " masteries!")
+    if #writes > 0 then gg.setValues(writes); gg.alert("✅ Đã max " .. successCount .. " masteries!")
     else gg.alert("❌ Không có gì để max!") end
 end
 
@@ -1943,15 +1942,227 @@ local function GameDataMenu()
 end
 
 -- ═══════════════════════════════════════════════════════════
+--  ★ FEATURE #1: FAKE VIP
+-- ═══════════════════════════════════════════════════════════
+local FakeVIPState = false
+local FakeVIPBackup = nil
+
+local function fakeVIPFunc()
+    local choice = gg.choice({
+        "🌟 Bật Fake VIP ",
+        "❌ Tắt Fake VIP",
+        "⬅️ Quay lại"
+    }, nil, "🌟 Fake VIP (Display Only)\nTrạng thái: " .. (FakeVIPState and "🟢 ON" or "🔴 OFF") ..
+        "\n\n⚠️ Có thể chỉ hiển thị icon VIP,\nkhông có lợi ích server-side!")
+
+    if not choice or choice == 3 then return MainMenu() end
+
+    local base = VIPM.mainStatus()
+    if not base then
+        gg.alert("❌ Không tìm thấy Base Status!\n💡 Vào Garage → bấm 1 xe → thử lại.")
+        return
+    end
+
+    local vipPtr = VIPM.readPtr(base + 0x3A8)
+    if vipPtr == 0 then
+        gg.alert("❌ VIP Pointer rỗng!")
+        return
+    end
+    local vip = vipPtr + 0x10
+
+    if choice == 1 then
+        if FakeVIPState then gg.toast("✅ Đã bật rồi!"); return end
+
+        FakeVIPBackup = gg.getValues({
+            {address = vip,       flags = gg.TYPE_DWORD},
+            {address = vip + 0x4, flags = gg.TYPE_DWORD},
+            {address = vip + 0x8, flags = gg.TYPE_DWORD},
+        })
+
+        local farFuture = os.time(os.date("!*t")) + 86400 * 365 * 10
+        gg.setValues({
+            {address = vip,       flags = gg.TYPE_DWORD, value = 130559},
+            {address = vip + 0x4, flags = gg.TYPE_DWORD, value = 81},
+            {address = vip + 0x8, flags = gg.TYPE_DWORD, value = farFuture},
+        })
+
+        FakeVIPState = true
+        gg.alert("✅ Đã bật Fake VIP \n⚠️ Server có thể reject — chỉ là visual.")
+
+    elseif choice == 2 then
+        if not FakeVIPState or not FakeVIPBackup then
+            gg.alert("❌ Chưa bật!"); return
+        end
+        gg.setValues(FakeVIPBackup)
+        FakeVIPState = false
+        FakeVIPBackup = nil
+        gg.alert("❌ Đã tắt Fake VIP!")
+    end
+end
+
+-- ═══════════════════════════════════════════════════════════
+--  ★ FEATURE #2: REMOVE MASTERY TIME
+-- ═══════════════════════════════════════════════════════════
+local function removeMasteryTime()
+    local input = gg.prompt(
+        {"⏲️ Nhập tên xe (Case Sensitive! VD: STOCKER, HAVOC):"},
+        {""},
+        {"text"}
+    )
+    if not input or input[1] == "" then return end
+    local name = input[1]
+
+    gg.clearResults()
+    gg.setRanges(RANGE_VALUE)
+    gg.searchNumber(":" .. name, gg.TYPE_BYTE)
+
+    local allRes = gg.getResults(gg.getResultsCount())
+    if #allRes == 0 then
+        gg.alert("❌ Không tìm thấy xe: " .. name); return
+    end
+
+    local addrs = {}
+    for _, r in ipairs(allRes) do
+        table.insert(addrs, {address = r.address + 0xEF, flags = gg.TYPE_DWORD})
+    end
+
+    gg.loadResults(addrs)
+    gg.refineNumber("1~5", gg.TYPE_DWORD)
+
+    local unlocked = gg.getResults(gg.getResultsCount())
+    if #unlocked == 0 then
+        gg.alert("❌ Xe chưa mở khóa hoặc chưa có Mastery data!"); return
+    end
+
+    local patch = {}
+    for _, r in ipairs(unlocked) do
+        table.insert(patch, {address = r.address + 0x150, flags = gg.TYPE_DWORD, value = 1064972046})
+        table.insert(patch, {address = r.address + 0x154, flags = gg.TYPE_DWORD, value = 760095363})
+        table.insert(patch, {address = r.address + 0x158, flags = gg.TYPE_DWORD, value = -98777962})
+        table.insert(patch, {address = r.address + 0x15C, flags = gg.TYPE_DWORD, value = 1263588797})
+    end
+
+    gg.setValues(patch)
+    gg.clearResults()
+    gg.alert("✅ Đã xóa Mastery Time cho: " .. name ..
+             "\n\n👉 Nhấn vào icon Mastery vài lần trong game!")
+end
+
+-- ═══════════════════════════════════════════════════════════
+--  ★ FEATURE #3: FUEL HACK
+-- ═══════════════════════════════════════════════════════════
+local LowFuelFound, LowFuelRes, LowFuelOrig = false, {}, {}
+local NoFuelFound,  NoFuelRes,  NoFuelOrig  = false, {}, {}
+
+local function lowFuelToggle()
+    local c = gg.choice({"🟢 Bật Low Fuel","🔴 Tắt Low Fuel","⬅️ Quay lại"},
+        nil, "Low Fuel (làm ngoài Race ổn định hơn)")
+    if not c or c == 3 then return end
+
+    if c == 1 then
+        if LowFuelFound then gg.toast("✅ Đã bật rồi!"); return end
+        gg.clearResults(); gg.setRanges(gg.REGION_C_DATA)
+        gg.searchNumber("100", gg.TYPE_FLOAT)
+        local cnt = gg.getResultCount()
+        if cnt == 0 then
+            gg.alert("❌ Không tìm thấy Fuel trong C data!"); gg.setRanges(RANGE_VALUE); return
+        end
+        LowFuelRes = gg.getResults(cnt)
+        LowFuelOrig = gg.getValues(LowFuelRes)
+        local nv = {}
+        for i, v in ipairs(LowFuelRes) do
+            nv[i] = {address = v.address, flags = v.flags, value = 10, freeze = true}
+        end
+        gg.setValues(nv); gg.addListItems(nv)
+        LowFuelFound = true; gg.setRanges(RANGE_VALUE)
+        gg.alert("✅ Đã bật Low Fuel!")
+    else
+        if not LowFuelFound then gg.alert("❌ Chưa bật!"); return end
+        gg.clearList()
+        for i = 1, #LowFuelRes do LowFuelRes[i].freeze = false end
+        gg.setValues(LowFuelOrig)
+        LowFuelFound = false
+        gg.alert("❌ Đã tắt Low Fuel!")
+    end
+end
+
+local function noFuelToggle()
+    local c = gg.choice({"🟢 Bật No Fuel","🔴 Tắt No Fuel","⬅️ Quay lại"}, nil, "No Fuel")
+    if not c or c == 3 then return end
+
+    if c == 1 then
+        if NoFuelFound then gg.toast("✅ Đã bật rồi!"); return end
+        gg.clearResults(); gg.setRanges(gg.REGION_C_DATA)
+        gg.searchNumber("100", gg.TYPE_FLOAT)
+        local cnt = gg.getResultCount()
+        if cnt == 0 then
+            gg.alert("❌ Không tìm thấy Fuel!"); gg.setRanges(RANGE_VALUE); return
+        end
+        NoFuelRes = gg.getResults(cnt)
+        NoFuelOrig = gg.getValues(NoFuelRes)
+        local nv = {}
+        for i, v in ipairs(NoFuelRes) do
+            nv[i] = {address = v.address, flags = v.flags, value = 0}
+        end
+        gg.setValues(nv)
+        NoFuelFound = true; gg.setRanges(RANGE_VALUE)
+        gg.alert("✅ Đã bật No Fuel!")
+    else
+        if not NoFuelFound then gg.alert("❌ Chưa bật!"); return end
+        gg.setValues(NoFuelOrig)
+        NoFuelFound = false
+        gg.alert("❌ Đã tắt No Fuel!")
+    end
+end
+
+local function fuelHackMenu()
+    local choice = gg.choice({
+        "⛽ Unlimited Fuel (bật trong Race)",
+        "🛢 Low Fuel (Fume Boost)",
+        "❌ No Fuel",
+        "⬅️ Quay lại"
+    }, nil, "⛽ Fuel Hack")
+    if not choice or choice == 4 then return MainMenu() end
+
+    if choice == 1 then
+        gg.clearResults(); gg.clearList(); gg.setRanges(RANGE_VALUE)
+        gg.searchNumber("100", gg.TYPE_FLOAT)
+        gg.toast("⚠️ Nhấn GAS trong 2 giây!")
+        gg.sleep(2000)
+        gg.searchNumber("0~99.9", gg.TYPE_FLOAT)
+        local cnt = gg.getResultCount()
+        if cnt == 0 then
+            gg.alert("❌ Không tìm thấy! Đang trong Race và chạy chưa?"); return
+        end
+        local res = gg.getResults(cnt)
+        gg.addListItems(res)
+        local saved = gg.getListItems()
+        local edits = {}
+        for _, v in ipairs(saved) do
+            table.insert(edits, {address = v.address + 0x4, flags = gg.TYPE_FLOAT, value = 1000})
+        end
+        gg.setValues(edits); gg.addListItems(edits)
+        gg.clearResults()
+        gg.alert("✅ Đã bật Unlimited Fuel!")
+
+    elseif choice == 2 then lowFuelToggle()
+    elseif choice == 3 then noFuelToggle()
+    end
+
+    return fuelHackMenu()
+end
+
+-- ═══════════════════════════════════════════════════════════
 --  ABOUT
 -- ═══════════════════════════════════════════════════════════
 local function About()
     local info = [[
 ╔══════════════════════════════════╗
 ║      ꧁AɴнDᴇᴘZᴀı꧂ SCRIPT V3.2      ║
+║          MERGED EDITION          ║
 ╚══════════════════════════════════╝
 
-📌 Version: V3.2 (anhdepzai)
+📌 Version: V3.2 (anhdepzai) + Merged
 🎮 Game: Hill Climb Racing 2
 ⚙️ GG: 101.1
 
@@ -1960,7 +2171,7 @@ local function About()
    ✈️ Telegram :: @Andepzai
    📺 Youtube  :: @Andepzai
 
-⚡ FEATURES (29):
+⚡ FEATURES (32):
    ✅ Auto Win (ARMV8)
    ✅ Fake Unlock
    ✅ Free Upgrade
@@ -1988,6 +2199,9 @@ local function About()
    ✅ Global Vision 
    ✅ Terrain Flat Advanced 
    ✅ Map Modification     
+   ✅ 🌟 Fake VIP           
+   ✅ ⏲️ Remove Mastery Time 
+   ✅ ⛽ Fuel Hack           
    ✅ About
    ✅ Exit
 
@@ -2026,10 +2240,13 @@ function MainMenu()
         "🎯 Team Event Menu",
         "🎉 Event Menu",
         "📚 Game Data Browser",
-        "🚗 Vehicle Speed ",
-        "👁️ Global Vision ",
+        "🚗 Vehicle Speed",
+        "👁️ Global Vision",
         "➖ Terrain Flat Advanced",
         "🗺️ Map Modification",
+        "🌟 Fake VIP",
+        "⏲️ Remove Mastery Time",
+        "⛽ Fuel Hack",
         "ℹ️ About",
         "❌ Exit"
     }
@@ -2062,8 +2279,11 @@ function MainMenu()
     elseif choice == 25 then GlobalVisionMenu()
     elseif choice == 26 then TerrainFlatMenu()
     elseif choice == 27 then MapModificationArea()
-    elseif choice == 28 then About()
-    elseif choice == 29 then
+    elseif choice == 28 then fakeVIPFunc()
+    elseif choice == 29 then removeMasteryTime()
+    elseif choice == 30 then fuelHackMenu()
+    elseif choice == 31 then About()
+    elseif choice == 32 then
         gg.setVisible(true)
         print(ShowPrint)
         os.exit()
@@ -2088,7 +2308,7 @@ selectRange()
 gg.clearResults()
 gg.clearList()
 gg.setRanges(RANGE_VALUE)
-gg.toast("🚀 Starting AɴнDᴇᴘZaı V3.2 ( Merged)...")
+gg.toast("🚀 Starting AɴнDᴇᴘZaı V3.2 (Merged 32 features)...")
 gg.sleep(800)
 
 if not findGameStatus() then
