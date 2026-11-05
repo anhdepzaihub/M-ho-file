@@ -1,11 +1,11 @@
-
+--[[
 ╔══════════════════════════════════════════════════════════════╗
 ║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.2  ▓▓▓                   ║
 ║      HCR2 Cheat Menu         ║
 ║                                                              ║
 ║    📢 Discord  :: Andepzai                                    ║
 ║    📢 Telegram :: @Andepzai                                   ║
-║    📢 Youtube  :: @Andepza i                                  ║
+║    📢 Youtube  :: @Andepza                                   ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
@@ -2088,7 +2088,7 @@ selectRange()
 gg.clearResults()
 gg.clearList()
 gg.setRanges(RANGE_VALUE)
-gg.toast("🚀 Starting AɴнDᴇᴘZᴀı V3.2 ( Merged)...")
+gg.toast("🚀 Starting AɴнDᴇᴘZaı V3.2 ( Merged)...")
 gg.sleep(800)
 
 if not findGameStatus() then
