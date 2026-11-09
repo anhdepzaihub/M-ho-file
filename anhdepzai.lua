@@ -1,21 +1,21 @@
 --[[
 ╔══════════════════════════════════════════════════════════════╗
-║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.4  ▓▓▓                   ║
+║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.3  ▓▓▓                   ║
 ║      HCR2 Cheat Menu                                         ║
 ║                                                              ║
-║    📢 Discord  :: Andepzai                                    ║
-║    📢 Telegram :: @Andepzai                                   ║
+║    📢 Discord  :: anhhoang_907                                    ║
+║    📢 Telegram :: t.me/anhdepzai360                                   ║
 ║    📢 Youtube  :: @Andepza                                    ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
 local ShowPrint = [[
 ╔══════════════════════════════════════════════════════════════╗
-║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.4  ▓▓▓                   ║
+║            ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.3  ▓▓▓                   ║
 ║                  Thanks for using!                           ║
 ║                                                              ║
-║    📢 Discord  :: Andepzai                                    ║
-║    📢 Telegram :: @Andepzai                                   ║
+║    📢 Discord  :: anhhoang_907                                    ║
+║    📢 Telegram :: t.me/anhdepzai360                                  ║
 ║    📢 Youtube  :: @Andepzai                                   ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
@@ -53,7 +53,6 @@ function yj.Csearchcalculatestheoffset(value, flags)
     return gg.getResults(1)[1].address
 end
 function yj.CsetValuesoffset(offset, flags, value)
-    if not offset then return end
     gg.setValues({{address = offset, flags = flags, value = value}})
 end
 function yj.Allzeropages()
@@ -68,9 +67,6 @@ function yj.Allzeropages()
     end
     gg.toast("Không tìm thấy vùng nhớ trang 0")
     return nil
-end
-function yj.floatToDec(f)
-    return string.unpack("<I4", string.pack("<f", tonumber(f) or 0))
 end
 
 local game_data = {
@@ -283,7 +279,6 @@ end
 local Vehiclespeedchangeoffset = nil
 local Vehiclegearshiftvalue = nil
 local function VehicleSpeedSet(value)
-    if not Vehiclespeedchangeoffset then return end
     yj.CsetValuesoffset(Vehiclespeedchangeoffset + 0x8, 16, value)
     gg.toast("✅ Đã đặt tốc độ: " .. value)
 end
@@ -322,7 +317,6 @@ end
 local Globalvisionoffset = nil
 local Globalvisionoffsetvalue = nil
 local function GlobalVisionSet(value)
-    if not Globalvisionoffset then return end
     yj.CsetValuesoffset(Globalvisionoffset + 0x1C, 16, value)
     yj.CsetValuesoffset(Globalvisionoffset + 0x20, 16, value)
     gg.toast("✅ Đã đặt tầm nhìn: " .. value)
@@ -367,12 +361,12 @@ local function Terrain_Modify(searchPattern, replaceValue, msg, refinePattern)
     TerrainFlatMenu()
 end
 local function Terrain_EnableGlobalFlat()
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
+    gg.clearResults(); gg.setRanges(8)
     gg.searchNumber("0.3", 16); gg.getResults(100); gg.editAll("999.762", 16)
     gg.toast("✅ Đã làm phẳng toàn bộ địa hình"); gg.clearResults(); TerrainFlatMenu()
 end
 local function Terrain_DisableGlobalFlat()
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
+    gg.clearResults(); gg.setRanges(8)
     gg.searchNumber("999.762", 16); gg.getResults(100); gg.editAll("0.3", 16)
     gg.toast("🔴 Đã tắt làm phẳng toàn bộ"); gg.clearResults(); TerrainFlatMenu()
 end
@@ -471,7 +465,7 @@ local function flyHack()
 end
 
 local VEHICLES = {
-    "ALL","HILL CLIMBER","HILL CLIMBER Mk2","SPORTS CAR","DUNE BUGGY","SUPER DIESEL","SUPERBIKE","SUPERCAR","RALLY CAR","LOWRIDER","BEAST","HOT ROD","RACING TRUCK","FORMULA","MUSCLE CAR","MONSTER TRUCK","ROTATOR","CHOPPER","TANK","CC-EV","STOCKER","HAVOC","BUS","MOONLANDER","HOVERBIKE","ROCK BOUNCER","RAIDER","BOLT","ATV","OFFROADER","SCOOTER","MOTOCROSS","TRACTOR","SNOWMOBILE","MONOWHEEL","GLIDER"
+    "SLED","DOUGHNUT","SNOWBOARD","HILL CLIMBER","HILL CLIMBER Mk2","SPORTS CAR","DUNE BUGGY","SUPER DIESEL","SUPERBIKE","SUPERCAR","RALLY CAR","LOWRIDER","BEAST","HOT ROD","RACING TRUCK","FORMULA","MUSCLE CAR","MONSTER TRUCK","ROTATOR","CHOPPER","TANK","CC-EV","STOCKER","HAVOC","BUS","MOONLANDER","HOVERBIKE","ROCK BOUNCER","RAIDER","BOLT","ATV","OFFROADER","SCOOTER","MOTOCROSS","TRACTOR","SNOWMOBILE","MONOWHEEL","GLIDER"
 }
 local function unlockVehicleByName(name)
     if not name or name == "" then return false end
@@ -745,9 +739,6 @@ local function flatGroundAdventure()
     elseif choice == 7 then toggle("1113060784", 1144750080, 1113060784, RANGE_VALUE) end
 end
 
--- ═══════════════════════════════════════════════════════════
---  LIB OFFSETS (V3.4 - cập nhật cho 1.75.0)
--- ═══════════════════════════════════════════════════════════
 local libOffsets = {
     ["arm64-v8a"] = {
         [1] = { name = "Auto Win", edits = {
@@ -757,16 +748,13 @@ local libOffsets = {
             {0x249AEB8, "00000000r"}
         }},
         [2] = { name = "Fake Unlock", edits = {{0x15180D0, "20008052r"}} },
-        [3] = { name = "Free Upgrade", edits = {
+        [3] = { name = "Free Upgrades", edits = {
             {0xFA4270, "0090641Er"},
             {0xFA428C, "0090641Er"}
         }},
-        [4] = { name = "Force Boss", edits = {
-            {0x16988D4, "00C15FBCr"},
-            {0x16B6544, "00C15FBCr"}
-        }},
     }
 }
+
 local function getArchKey()
     if archType == 1 then return "arm64-v8a"
     elseif archType == 2 then return "armeabi-v7a"
@@ -774,6 +762,7 @@ local function getArchKey()
     elseif archType == 4 then return "x86" end
     return nil
 end
+
 local function applyLibEdits(entry, backupTable, enable)
     if not entry or not entry.edits or #entry.edits == 0 then return false end
     if not LIB_BASE then gg.alert("❌ LIB_BASE chưa có!"); return false end
@@ -803,7 +792,6 @@ end
 local autoWinState, autoWinBackup = false, nil
 local fakeUnlockState, fakeUnlockBackup = false, nil
 local freeUpgradeState, freeUpgradeBackup = false, nil
-local forceBossState, forceBossBackup, forceBossEdits = false, nil, nil
 
 local function autoWin()
     if archType == 3 or archType == 4 then gg.alert("❗ Chỉ ARM (ARMV8)!"); return end
@@ -866,69 +854,6 @@ local function freeUpgrade()
         if not freeUpgradeState then gg.alert("❌ Chưa bật!"); return end
         if applyLibEdits(entry, freeUpgradeBackup, false) then freeUpgradeState = false; freeUpgradeBackup = nil; gg.toast("❌ TẮT")
         else gg.alert("❌ Tắt thất bại!") end
-    end
-end
-
--- ═══════════════════════════════════════════════════════════
---  FORCE BOSS (lib patch + float 99.9 @ BaseGameStatus-0x4)
--- ═══════════════════════════════════════════════════════════
-local function forceBoss()
-    if archType == 3 or archType == 4 then gg.alert("❗ Chỉ ARM (ARMV8)!"); return end
-    local archKey = getArchKey()
-    if not archKey or not libOffsets[archKey] then
-        gg.alert("❌ Không có offset cho arch!"); return
-    end
-    local entry = libOffsets[archKey][4]
-    if not entry then gg.alert("❌ Entry trống!"); return end
-
-    local choice = gg.choice(
-        {"🟢 Bật Force Boss","🔴 Tắt Force Boss","⬅️ Quay lại"}, nil,
-        "👹 " .. entry.name .. "\n📦 " .. #entry.edits .. " patches | " .. archKey ..
-        "\nTrạng thái: " .. (forceBossState and "🟢 ON" or "🔴 OFF"))
-    if not choice or choice == 3 then return MainMenu() end
-
-    if choice == 1 then
-        if forceBossState then gg.toast("✅ Đã bật rồi!"); return end
-        if not BaseGameStatus or BaseGameStatus == 0 then
-            if not findGameStatus() then
-                gg.alert("❌ Chưa scan được GameStatus!\n\n💡 Vào Garage (bấm 1 xe) rồi thử lại.")
-                return
-            end
-        end
-        forceBossBackup = {}
-        if not applyLibEdits(entry, forceBossBackup, true) then
-            forceBossBackup = nil
-            gg.alert("❌ Bật lib patches thất bại!"); return
-        end
-        local targetAddr = BaseGameStatus - 0x4
-        local cur = gg.getValues({{address = targetAddr, flags = gg.TYPE_FLOAT}})
-        if cur and cur[1] then
-            forceBossEdits = {{address = targetAddr, flags = gg.TYPE_FLOAT, origValue = cur[1].value}}
-            gg.setValues({{address = targetAddr, flags = gg.TYPE_FLOAT, value = 99.9}})
-            forceBossState = true
-            gg.toast("✅ Force Boss BẬT")
-        else
-            applyLibEdits(entry, forceBossBackup, false)
-            forceBossBackup = nil
-            gg.alert("❌ Không đọc được giá trị float tại BaseGameStatus-0x4!")
-        end
-    elseif choice == 2 then
-        if not forceBossState then gg.alert("❌ Chưa bật!"); return end
-        if applyLibEdits(entry, forceBossBackup, false) then
-            if forceBossEdits then
-                local resets = {}
-                for _, v in ipairs(forceBossEdits) do
-                    resets[#resets+1] = {address = v.address, flags = v.flags, value = v.origValue}
-                end
-                gg.setValues(resets)
-                forceBossEdits = nil
-            end
-            forceBossState = false
-            forceBossBackup = nil
-            gg.toast("❌ Force Boss TẮT")
-        else
-            gg.alert("❌ Tắt thất bại!")
-        end
     end
 end
 
@@ -1324,6 +1249,9 @@ local function MasteryCupsMenu()
     end
 end
 
+-- ═══════════════════════════════════════════════════════════
+--  EVENT MENU (gốc)
+-- ═══════════════════════════════════════════════════════════
 local function EventMenu()
     if not checkGameStatus() then return end
     local choice = gg.choice({
@@ -1942,9 +1870,7 @@ local function ADZ_ScanParts()
     gg.clearResults()
     if not fb then return nil end
     local p1 = gg.getValues({{address=fb+0xB0,flags=gg.TYPE_QWORD}})[1].value
-    if not p1 or p1 == 0 then return nil end
     local cdp = gg.getValues({{address=p1,flags=gg.TYPE_QWORD}})[1].value
-    if not cdp or cdp == 0 then return nil end
     gg.searchNumber(cdp, gg.TYPE_QWORD)
     local all = gg.getResults(gg.getResultsCount()); gg.clearResults()
     local out = {}
@@ -1961,9 +1887,7 @@ local function ADZ_ApplyPart(idx, val)
     _spData = _spData or ADZ_ScanParts()
     if not _spData then gg.alert("❌ Scan parts fail!"); return end
     local pair = P_VALS[idx]; if not pair then return end
-    local denom = val - pair[1]
-    if denom == 0 then denom = 0.0001 end
-    local mul = (pair[2]-pair[1])/denom + 1.0
+    local mul = (pair[2]-pair[1])/(val-pair[1])+1.0
     local s1 = tonumber(yj.floatToDec(pair[1]) or 0)
     local s2 = tonumber(yj.floatToDec(pair[2]) or 0)
     local n = 0
@@ -2243,6 +2167,9 @@ local function ADZ_EventUnlockAllVehicles(sa)
     gg.toast("✅ "..n.." vehicles unlocked → item #1")
 end
 
+-- ═══════════════════════════════════════════════════════════
+--  EVENT REWARD REPLACEMENT (ported from Gentle 2.4)
+-- ═══════════════════════════════════════════════════════════
 local function ADZ_GetResourcePool()
     gg.clearResults(); gg.setRanges(RANGE_VALUE)
     gg.searchNumber("h 0A 73 74 61 72 73 00 00", gg.TYPE_BYTE)
@@ -2316,7 +2243,10 @@ function ADZ_ReplaceEventReward()
     if not amt then return end
     _rewardAmount = tonumber(amt[1]) or 100
     local baseZp = yj.Allzeropages()
-    if not baseZp then gg.alert("❌ Không tìm được zero page!"); return end
+    if not baseZp then
+        gg.alert("❌ Không tìm được zero page!")
+        return
+    end
     local resData = {}
     for j = 0, 5 do
         resData[j] = gg.getValues({{address=resource.address + j*4, flags=gg.TYPE_DWORD}})[1].value
@@ -2398,10 +2328,10 @@ end
 local function About()
     local info = [[
 ╔══════════════════════════════════╗
-║      ꧁AɴнDᴇᴘZᴀı꧂ SCRIPT V3.4      ║
+║      ꧁AɴнDᴇᴘZᴀı꧂ SCRIPT V3.3      ║
 ╚══════════════════════════════════╝
 
-📌 Version: V3.4 (anhdepzai + Eomthix offsets)
+📌 Version: V3.3 (anhdepzai)
 🎮 Game: Hill Climb Racing 2
 ⚙️ GG: 101.1
 
@@ -2410,11 +2340,10 @@ local function About()
    ✈️ Telegram :: @Andepzai
    📺 Youtube  :: @Andepzai
 
-⚡ FEATURES (33):
-   ✅ Auto Win (ARMV8) ⭐ NEW offsets
-   ✅ Force Boss (ARMV8) ⭐ NEW
+⚡ FEATURES (32):
+   ✅ Auto Win (ARMV8)
    ✅ Fake Unlock
-   ✅ Free Upgrade ⭐ NEW offsets
+   ✅ Free Upgrade
    ✅ Upgrade Parts Without Scrap
    ✅ Fly Hack
    ✅ Unlock Any Vehicle
@@ -2426,7 +2355,7 @@ local function About()
    ✅ Adventure Chest Hack V1
    ✅ Flat Ground for Adventure
    ✅ Debug Mode
-   ✅ VIP Pass (Real + Fake)
+   ✅ VIP Pass (Real + Fake)           
    ✅ Diamonds (SR) + Bypass
    ✅ Max Vehicles
    ✅ Max Mastery
@@ -2439,9 +2368,9 @@ local function About()
    ✅ Vehicle Speed
    ✅ Global Vision
    ✅ Terrain Flat Advanced
-   ✅ Player Data (39 fields)
-   ✅ Super Parts Custom (~75 params)
-   ✅ Events Shop (Free/Inject/Reward/Unlock)
+   ✅ Player Data (39 fields)          
+   ✅ Super Parts Custom (~75 params)  
+   ✅ Events Shop (Free/Inject/Reward/Unlock) 
    ✅ About
    ✅ Exit
 
@@ -2452,13 +2381,12 @@ local function About()
 end
 
 -- ═══════════════════════════════════════════════════════════
---  MENU CHÍNH V3.4 (33 mục)
+--  MENU CHÍNH v3.3 (32 mục)
 -- ═══════════════════════════════════════════════════════════
 function MainMenu()
     gg.setVisible(false)
     local menu = {
         "🔥 Auto Win (ARMV8)",
-        "👹 Force Boss (ARMV8)",
         "🎭 Fake Unlock",
         "🔧 Free Upgrade",
         "⚡ Upgrade Parts Without Scrap",
@@ -2491,41 +2419,40 @@ function MainMenu()
         "ℹ️ About",
         "❌ Exit"
     }
-    local choice = gg.choice(menu, nil, "AɴнDᴇᴘZᴀı V3.4")
+    local choice = gg.choice(menu, nil, "AɴнDᴇᴘZᴀı V3.3")
     if not choice then return end
-    if     choice == 1  then autoWin()
-    elseif choice == 2  then forceBoss()
-    elseif choice == 3  then fakeUnlock()
-    elseif choice == 4  then freeUpgrade()
-    elseif choice == 5  then upgradeWithoutScrap()
-    elseif choice == 6  then flyHack()
-    elseif choice == 7  then unlockAnyVehicle()
-    elseif choice == 8  then tracksEditor()
-    elseif choice == 9  then vehicleHacksMenu()
-    elseif choice == 10 then freeChests()
-    elseif choice == 11 then freePurchases()
-    elseif choice == 12 then partsDropLegendary()
-    elseif choice == 13 then advChestHackV1()
-    elseif choice == 14 then flatGroundAdventure()
-    elseif choice == 15 then debugMode()
-    elseif choice == 16 then VIPmodificationsmenu()
-    elseif choice == 17 then diamondsSR()
-    elseif choice == 18 then MaxVehicles()
-    elseif choice == 19 then MaxMastery()
-    elseif choice == 20 then MaxParts()
-    elseif choice == 21 then SetFuelCoins()
-    elseif choice == 22 then MasteryCupsMenu()
-    elseif choice == 23 then TeamEventMenu()
-    elseif choice == 24 then EventMenu()
-    elseif choice == 25 then GameDataMenu()
-    elseif choice == 26 then VehicleSpeedMenu()
-    elseif choice == 27 then GlobalVisionMenu()
-    elseif choice == 28 then TerrainFlatMenu()
-    elseif choice == 29 then ADZ_PlayerMenu()
-    elseif choice == 30 then ADZ_SuperPartsMenu()
-    elseif choice == 31 then ADZ_EventsShopMenu()
-    elseif choice == 32 then About()
-    elseif choice == 33 then
+    if choice == 1 then autoWin()
+    elseif choice == 2 then fakeUnlock()
+    elseif choice == 3 then freeUpgrade()
+    elseif choice == 4 then upgradeWithoutScrap()
+    elseif choice == 5 then flyHack()
+    elseif choice == 6 then unlockAnyVehicle()
+    elseif choice == 7 then tracksEditor()
+    elseif choice == 8 then vehicleHacksMenu()
+    elseif choice == 9 then freeChests()
+    elseif choice == 10 then freePurchases()
+    elseif choice == 11 then partsDropLegendary()
+    elseif choice == 12 then advChestHackV1()
+    elseif choice == 13 then flatGroundAdventure()
+    elseif choice == 14 then debugMode()
+    elseif choice == 15 then VIPmodificationsmenu()
+    elseif choice == 16 then diamondsSR()
+    elseif choice == 17 then MaxVehicles()
+    elseif choice == 18 then MaxMastery()
+    elseif choice == 19 then MaxParts()
+    elseif choice == 20 then SetFuelCoins()
+    elseif choice == 21 then MasteryCupsMenu()
+    elseif choice == 22 then TeamEventMenu()
+    elseif choice == 23 then EventMenu()
+    elseif choice == 24 then GameDataMenu()
+    elseif choice == 25 then VehicleSpeedMenu()
+    elseif choice == 26 then GlobalVisionMenu()
+    elseif choice == 27 then TerrainFlatMenu()
+    elseif choice == 28 then ADZ_PlayerMenu()
+    elseif choice == 29 then ADZ_SuperPartsMenu()
+    elseif choice == 30 then ADZ_EventsShopMenu()
+    elseif choice == 31 then About()
+    elseif choice == 32 then
         gg.setVisible(true)
         print(ShowPrint)
         os.exit()
@@ -2543,14 +2470,14 @@ archType = detectArch()
 gameVersion = getHCR2Version()
 
 if archType == 3 or archType == 4 then
-    gg.alert("⚠️ Phát hiện Emulator!\nAuto Win / Force Boss / Fake Unlock / Free Upgrade sẽ không hoạt động.")
+    gg.alert("⚠️ Phát hiện Emulator!\nAuto Win / Fake Unlock / Free Upgrade sẽ không hoạt động.")
 end
 
 selectRange()
 gg.clearResults()
 gg.clearList()
 gg.setRanges(RANGE_VALUE)
-gg.toast("🚀 Starting AɴнDᴇᴘZaı V3.4...")
+gg.toast("🚀 Starting AɴнDᴇᴘZaı V3.3...")
 gg.sleep(800)
 
 if not findGameStatus() then
