@@ -1,23 +1,14 @@
 --[[
 ╔══════════════════════════════════════════════════════════════╗
-║         ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.4  ▓▓▓                     ║
-║              HCR2 Cheat Menu + Eomthix Merge                 ║
-║                                                              ║
-║    📢 Discord  :: anhhoang_907                               ║
-║    📢 Telegram :: t.me/anhdepzai360                          ║
-║    📢 Youtube  :: @Andepza                                   ║
-║                                             
-
+║         ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.5   ▓▓▓        ║
+║              HCR2 Cheat Menu        ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
 local ShowPrint = [[
 ╔══════════════════════════════════════════════════════════════╗
-║         ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.4  ▓▓▓                     ║
+║         ▓▓▓  AɴнDᴇᴘZᴀı SCRIPT V3.5  ▓▓▓                     ║
 ║                  Thanks for using!                           ║
-║    📢 Discord :: anhhoang_907                                ║
-║    📢 Telegram :: t.me/anhdepzai360                          ║
-║    📢 Youtube :: @Andepza                                    ║
 ╚══════════════════════════════════════════════════════════════╝
 ]]
 
@@ -31,10 +22,9 @@ local BaseGameStatusRaw = nil
 local BaseRegion = nil
 
 -- ═══════════════════════════════════════════════════════════════
---  yj MODULE (fixed: floatToDec)
+--  yj MODULE
 -- ═══════════════════════════════════════════════════════════════
 yj = {}
-
 function yj.floatToDec(f)
     local page = gg.allocatePage(gg.PROT_READ | gg.PROT_WRITE, false)
     gg.setValues({{address = page, flags = gg.TYPE_FLOAT, value = f}})
@@ -42,7 +32,6 @@ function yj.floatToDec(f)
     gg.freePage(page)
     return v
 end
-
 function yj.getString(addr)
     local bytes = {}
     for i = 0, 255 do
@@ -78,7 +67,6 @@ function yj.Allzeropages()
         gg.clearResults()
         return r[1].address + 0x18
     end
-    gg.toast("Không tìm thấy vùng nhớ trang 0")
     return nil
 end
 
@@ -115,7 +103,6 @@ local game_data = {
         UnlockMasteryVehicles = { "STOCKER","HAVOC" }
     }
 }
-
 local function gd_allVehicles()
     local out = {}
     for _, v in ipairs(game_data.gameStatusVehicles) do out[#out+1] = v end
@@ -138,7 +125,6 @@ local function gd_unlockMethod(name)
     end
     return methods
 end
-
 local gd_tuneGroupNames = {
     "🔩 Chassis / Body","⚡ Boost / Jump","🏎️ Aero / Afterburner","💠 Power-ups","🎵 Special"
 }
@@ -250,7 +236,6 @@ local function findGameStatus()
     end
     return false
 end
-
 local function readStringAt(addr, maxLen)
     maxLen = maxLen or 64
     local reads = {}
@@ -264,7 +249,6 @@ local function readStringAt(addr, maxLen)
     end
     return table.concat(bytes)
 end
-
 local PART_CAPS = {
     ["_magnet"] = 15, ["_heavyweight"] = 15, ["_glide"] = 15,
     ["_rollcage"] = 15, ["_air_control"] = 15, ["_winter_tyres"] = 15,
@@ -288,7 +272,6 @@ local function checkGameStatus()
     end
     return true
 end
-
 local VERSION_OFFSETS = {
     ["1.74"] = { freezeDiamond = 0x21CC3F4, vnpStats = 0x1FBE5A0 },
     ["1.75"] = { freezeDiamond = 0x22049C4, vnpStats = 0x2060CA0 },
@@ -391,14 +374,38 @@ local function Terrain_Modify(searchPattern, replaceValue, msg, refinePattern)
     TerrainFlatMenu()
 end
 local function Terrain_EnableGlobalFlat()
-    gg.clearResults(); gg.setRanges(8)
-    gg.searchNumber("0.3", 16); gg.getResults(100); gg.editAll("999.762", 16)
-    gg.toast("✅"); gg.clearResults(); TerrainFlatMenu()
+    gg.clearResults()
+    gg.setRanges(gg.REGION_C_BSS)
+    gg.searchNumber("0.3", gg.TYPE_FLOAT)
+    local count = gg.getResultsCount()
+    if count == 0 then
+        gg.setRanges(RANGE_VALUE)
+        gg.alert("❌ Không tìm thấy pattern!\n💡 Vào 1 map adventure trước rồi thử lại.")
+        return TerrainFlatMenu()
+    end
+    gg.getResults(100)
+    gg.editAll("999.762", gg.TYPE_FLOAT)
+    gg.clearResults()
+    gg.setRanges(RANGE_VALUE)
+    gg.toast("✅ Đã làm phẳng toàn bộ (" .. count .. " vùng)")
+    TerrainFlatMenu()
 end
 local function Terrain_DisableGlobalFlat()
-    gg.clearResults(); gg.setRanges(8)
-    gg.searchNumber("999.762", 16); gg.getResults(100); gg.editAll("0.3", 16)
-    gg.toast("🔴 Đã tắt làm phẳng toàn bộ"); gg.clearResults(); TerrainFlatMenu()
+    gg.clearResults()
+    gg.setRanges(gg.REGION_C_BSS)
+    gg.searchNumber("999.762", gg.TYPE_FLOAT)
+    local count = gg.getResultsCount()
+    if count == 0 then
+        gg.setRanges(RANGE_VALUE)
+        gg.alert("❌ Không có gì để restore!\n💡 Có thể bạn chưa bật tính năng này.")
+        return TerrainFlatMenu()
+    end
+    gg.getResults(100)
+    gg.editAll("0.3", gg.TYPE_FLOAT)
+    gg.clearResults()
+    gg.setRanges(RANGE_VALUE)
+    gg.toast("🔴 Đã tắt làm phẳng toàn bộ (" .. count .. " vùng)")
+    TerrainFlatMenu()
 end
 local function Terrain_Pastoralland() Terrain_Modify('1;1,116,471,296;1,106,247,680::9', '1,185,782,784', "Đồng quê phẳng", '1;1,116,471,296') end
 local function Terrain_Inthegarden() Terrain_Modify('2;1,101,004,800;1,084,227,584:9', '1,160,708,096', "Đồng quê trận 145", '1,101,004,800') end
@@ -501,7 +508,7 @@ local function flyHack()
 end
 
 -- ═══════════════════════════════════════════════════════════════
---  UNLOCK ANY VEHICLE (GIỮ NGUYÊN - memory based)
+--  UNLOCK ANY VEHICLE
 -- ═══════════════════════════════════════════════════════════════
 local VEHICLES = {
     "SLED","DOUGHNUT","SNOWBOARD","HILL CLIMBER","HILL CLIMBER Mk2","SPORTS CAR","DUNE BUGGY","SUPER DIESEL","SUPERBIKE","SUPERCAR","RALLY CAR","LOWRIDER","BEAST","HOT ROD","RACING TRUCK","FORMULA","MUSCLE CAR","MONSTER TRUCK","ROTATOR","CHOPPER","TANK","CC-EV","STOCKER","HAVOC","BUS","MOONLANDER","HOVERBIKE","ROCK BOUNCER","RAIDER","BOLT","ATV","OFFROADER","SCOOTER","MOTOCROSS","TRACTOR","SNOWMOBILE","MONOWHEEL","GLIDER"
@@ -586,71 +593,103 @@ end
 -- ═══════════════════════════════════════════════════════════════
 --  VEHICLE HACKS
 -- ═══════════════════════════════════════════════════════════════
-local VehicleHacks = {
-    f1  = { name = "Lowrider - Super Jumpshocks", search = 'Q 00 00 A0 "A" 00 80 40 66 66 06 41', replace = 'Q 00 00 A0 "A" 00 80 "@" 00 C8 41', state = false, results = nil },
-    f2  = { name = "Hot Rod - Boost Hack", search = "4620693218774745088", replace = "4620693218877722624", state = false, results = nil },
-    f3  = { name = "CC-EV - Super Boost", search = 'Q 00 00 A0 "A" 00 08 "A" 00 48 41', replace = 'Q 00 00 A0 "A" 00 08 "A" 00 C8 42', state = false, results = nil },
-    f4  = { name = "Glider - Infinite Propeller", search = 'Q 00 00 A0 "A" 00 C0 "?" 00 40 40', replace = 'Q 00 00 A0 "A" 00 C0 3F 28 6B EE 4E', state = false, results = nil },
-    f5  = { name = "Muscle Car - Engine Hack", search = '20f;34f;44f:9', refine = '44', replace = '220', state = false, results = nil },
-    f6  = { name = "Glider - Infinite Wing", search = 'Q 00 00 A0 "A" 00 A0 "@" 00 20 41', replace = 'Q 00 00 A0 "A" 00 A0 40 66 7F E2 4E', state = false, results = nil },
-    f7  = { name = "Muscle Car - Super Burn-Out", search = 'Q 00 00 A0 "A" 00 60 "@" 00 D0 40', replace = 'Q 00 00 A0 "A" 00 60 "@" 00 FA 43', state = false, results = nil },
-    f8  = { name = "Rally Car - Grip Hack", search = '0.8;1.2:5', refine = '1.2', replace = '999', state = false, results = nil },
-    f9  = { name = "Formula - Super Grip", search = 'Q 00 00 A0 41 CD CC CC ">" 00 C0 3F', replace = 'Q 00 00 A0 41 CD CC CC ">" 00 70 41', state = false, results = nil },
-    f10 = { name = "Supercar - Super Air Brake", search = 'Q 00 00 A0 "A" 00 A0 C0 00 00 A0 C1', replace = 'Q 00 00 A0 "A" 00 A0 C0 00 00 C8 C2', state = false, results = nil },
-    f11 = { name = "Supercar - Reverse Air Brake", search = 'Q 00 00 A0 "A" 00 A0 C0 00 00 A0 C1', replace = 'Q 00 00 A0 "A" 00 A0 C0 00 00 8C 42', state = false, results = nil },
-    f12 = { name = "Rally Car - Engine Hack", search = '10;25:5', refine = '25', replace = '999', state = false, results = nil },
-    f13 = { name = "Muscle Car - Downforce + Fuel", search = '43.0;1.27999997139;2.0;0.69999998808;25.0:49', refine = '43', replace = '1000', state = false, results = nil }
+local vhState = {
+    hotRodBoost    = { on = false, saved = {} },
+    muscleCarBoost = { on = false, saved = {} },
+    gliderFly      = { on = false, saved = {} },
+    hoverbikeFly   = { on = false, saved = {} },
+    hoverbikeFuel  = { on = false, saved = {} },
 }
-local function toggleVehicleHack(key)
-    local data = VehicleHacks[key]
-    if not data then return end
-    local choice = gg.choice({"🟢 BẬT","🔴 TẮT","⬅️ Quay lại"}, nil,
-        "🔧 " .. data.name .. "\nTrạng thái: " .. (data.state and "🟢 ON" or "🔴 OFF"))
-    if not choice or choice == 3 then return end
-    local vType = gg.TYPE_FLOAT
-    local s = tostring(data.search)
-    if s:sub(1,2) == "Q " then vType = gg.TYPE_BYTE
-    elseif s:find(";") then vType = gg.TYPE_FLOAT
-    elseif not s:find("%.") then
-        if #s > 10 then vType = gg.TYPE_QWORD else vType = gg.TYPE_DWORD end
-    end
-    if choice == 1 then
-        gg.clearResults(); gg.setRanges(RANGE_VALUE)
-        gg.searchNumber(data.search, vType)
-        if data.refine and gg.getResultsCount() > 0 then gg.refineNumber(data.refine, vType) end
-        local count = gg.getResultsCount()
-        if count == 0 then gg.alert("❌ Không tìm thấy! Vào xe này trước.")
-        else
-            local results = gg.getResults(count)
-            data.results = gg.getValues(results)
-            gg.editAll(data.replace, vType)
-            data.state = true; gg.clearResults()
-            gg.toast("✅ Đã bật: " .. data.name)
+local vhMeta = {
+    hotRodBoost    = { label = "Hot Rod Boost",           hint = "Vào xe Hot Rod",     region = "C_BSS" },
+    muscleCarBoost = { label = "Muscle Car Boost",        hint = "Vào xe Muscle Car",  region = "C_BSS" },
+    gliderFly      = { label = "Glider Fly",              hint = "Vào xe Glider",      region = "C_DATA" },
+    hoverbikeFly   = { label = "Hoverbike Fly",           hint = "Vào xe Hoverbike",   region = "C_DATA|C_ALLOC" },
+    hoverbikeFuel  = { label = "Hoverbike Infinity Fuel", hint = "Vào xe Hoverbike",   region = "C_DATA|C_ALLOC" },
+}
+local function vhGetRegion(name)
+    if name == "C_BSS"            then return gg.REGION_C_BSS end
+    if name == "C_DATA"           then return gg.REGION_C_DATA end
+    if name == "C_DATA|C_ALLOC"   then return gg.REGION_C_DATA | gg.REGION_C_ALLOC end
+    return RANGE_VALUE
+end
+local function vhToggle(key)
+    local st   = vhState[key]
+    local meta = vhMeta[key]
+    local c = gg.choice({
+        "🟢 Bật " .. meta.label,
+        "🔴 Tắt " .. meta.label,
+        "⬅️ Quay lại"
+    }, nil, "🔧 " .. meta.label .. "\nTrạng thái: " .. (st.on and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return false end
+    if c == 1 then
+        if st.on then gg.toast("✅"); return true end
+        st.saved = {}
+        local pattern, replace, refineVal, useFloat
+        if key == "hotRodBoost" then
+            pattern = "h 9A 99 99 3D 00 00 00 3F 00 00 20 41"
+            replace = "h 9A 99 99 3D 00 00 00 3F 00 50 43 47"
+            useFloat = false
+        elseif key == "muscleCarBoost" then
+            pattern = "h 00 00 A0 3F 00 00 80 3F 00 00 80 40"
+            replace = "h 00 00 A0 3F 00 00 80 3F 00 00 16 44"
+            useFloat = false
+        elseif key == "gliderFly" then
+            pattern = "h CD CC 4C 3E CD CC 4C 3D 0A D7 A3 3D 0A D7 A3 3D"
+            replace = "h CD CC 4C 3E CD CC 4C 3D 00 00 40 BF 00 00 40 BF"
+            useFloat = false
+        elseif key == "hoverbikeFly" then
+            pattern = "20;150;1000::9"; refineVal = "1000"; replace = "99999999"; useFloat = true
+        elseif key == "hoverbikeFuel" then
+            pattern = "20;40;55::9"; refineVal = "55"; replace = "99999999"; useFloat = true
         end
-    elseif choice == 2 then
-        if data.results then
-            gg.setValues(data.results)
-            data.state = false
-            gg.toast("❌ Đã tắt: " .. data.name)
-        else gg.alert("❌ Chưa bật!") end
+        gg.clearResults()
+        gg.setRanges(vhGetRegion(meta.region))
+        gg.searchNumber(pattern, useFloat and gg.TYPE_FLOAT or gg.TYPE_BYTE)
+        if refineVal then gg.refineNumber(refineVal, gg.TYPE_FLOAT) end
+        local rs = gg.getResults(gg.getResultsCount())
+        gg.clearResults()
+        gg.setRanges(RANGE_VALUE)
+        if #rs == 0 then
+            gg.alert("❌ Không tìm thấy pattern!\n💡 " .. meta.hint .. " trước rồi thử lại.")
+            return true
+        end
+        local flagType = useFloat and gg.TYPE_FLOAT or gg.TYPE_BYTE
+        for _, v in ipairs(rs) do
+            st.saved[#st.saved + 1] = { address = v.address, flags = flagType, value = v.value }
+        end
+        gg.editAll(replace, flagType)
+        gg.clearResults()
+        st.on = true
+        gg.toast("✅ " .. meta.label .. " ON (" .. #rs .. " patch)")
+    elseif c == 2 then
+        if not st.on then gg.alert("❌ Chưa bật!"); return true end
+        if #st.saved > 0 then gg.setValues(st.saved) end
+        st.saved = {}
+        st.on = false
+        gg.toast("❌ " .. meta.label .. " OFF")
     end
+    return true
 end
 local function vehicleHacksMenu()
-    local keys = {}
-    for k in pairs(VehicleHacks) do table.insert(keys, k) end
-    table.sort(keys, function(a, b) return tonumber(a:match("%d+")) < tonumber(b:match("%d+")) end)
-    local labels = {}
-    local n = 1
-    for _, k in ipairs(keys) do
-        local v = VehicleHacks[k]
-        table.insert(labels, (v.state and "🟢" or "⚫") .. " " .. n .. ". " .. v.name)
-        n = n + 1
+    while true do
+        local items = {
+            (vhState.hotRodBoost.on    and "🟢" or "⚫") .. " 1. Hot Rod - Boost Hack",
+            (vhState.muscleCarBoost.on and "🟢" or "⚫") .. " 2. Muscle Car - Boost Hack",
+            (vhState.gliderFly.on      and "🟢" or "⚫") .. " 3. Glider - Fly Hack",
+            (vhState.hoverbikeFly.on   and "🟢" or "⚫") .. " 4. Hoverbike - Fly Hack",
+            (vhState.hoverbikeFuel.on  and "🟢" or "⚫") .. " 5. Hoverbike - Infinity Fuel",
+            "⬅️ Quay lại"
+        }
+        local c = gg.choice(items, nil, "🔧 Vehicle Hacks")
+        if not c or c == 6 then return MainMenu() end
+        if     c == 1 then vhToggle("hotRodBoost")
+        elseif c == 2 then vhToggle("muscleCarBoost")
+        elseif c == 3 then vhToggle("gliderFly")
+        elseif c == 4 then vhToggle("hoverbikeFly")
+        elseif c == 5 then vhToggle("hoverbikeFuel")
+        end
     end
-    table.insert(labels, "⬅️ Quay lại")
-    local pick = gg.choice(labels, nil, nil)
-    if not pick or pick == #labels then return MainMenu() end
-    toggleVehicleHack(keys[pick])
-    return vehicleHacksMenu()
 end
 
 -- ═══════════════════════════════════════════════════════════════
@@ -690,7 +729,7 @@ local function freePurchases()
     local c = gg.choice({"▶️ TIẾP TỤC","⬅️ Quay lại"}, nil, "⚠️ Cần kết nối Google Play!\nĐang ở Shop của game?")
     if c ~= 1 then return MainMenu() end
     gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("7,234,820", gg.TYPE_DWORD)
+    gg.searchNumber("7234820", gg.TYPE_DWORD)
     local results = gg.getResults(100)
     if #results == 0 then gg.alert("❌ Không tìm thấy! Vào Shop trước."); return end
     for _, v in ipairs(results) do
@@ -731,10 +770,9 @@ local function partsDropLegendary()
     for _, v in ipairs(values) do
         if v.value >= 1 and v.value <= 50 then v.value = 9999; table.insert(final, v) end
     end
-    if #final > 0 then gg.setValues(final); gg.clearResults(); gg.alert("✅ Đã bật!\nMở Legendary Chest!")
-    else gg.alert("❌ Không có giá trị hợp lệ!") end
+    if #final > 0 then gg.setValues(final); gg.clearResults(); gg.alert("✅\nMở Legendary Chest!")
+    else gg.alert("❌") end
 end
-
 local advChestV1Found = false
 local advChestV1Original = nil
 local function advChestHackV1()
@@ -774,9 +812,9 @@ local function flatGroundAdventure()
         gg.clearResults()
         if ranges then gg.setRanges(ranges) else gg.setRanges(RANGE_VALUE) end
         gg.searchNumber(search, gg.TYPE_DWORD)
-        if gg.getResultsCount() == 0 then gg.alert("❌ Không tìm thấy!"); return end
-        local val = gg.choice({"✅ Enable","❌ Disable"}, nil, "Toggle Flat Ground")
-        if val == 1 then gg.editAll(enableVal, gg.TYPE_DWORD); gg.alert("✅ Đã bật!")
+        if gg.getResultsCount() == 0 then gg.alert("❌ Không tìm thấy!"); gg.setRanges(RANGE_VALUE); return end
+        local val = gg.choice({"✅","❌"}, nil, "Toggle Flat Ground")
+        if val == 1 then gg.editAll(enableVal, gg.TYPE_DWORD); gg.alert("✅")
         elseif val == 2 then gg.editAll(disableVal, gg.TYPE_DWORD); gg.alert("❌ Đã tắt!") end
         gg.setRanges(RANGE_VALUE)
     end
@@ -784,8 +822,8 @@ local function flatGroundAdventure()
         gg.clearResults(); gg.setRanges(gg.REGION_C_DATA)
         gg.searchNumber("0.7", gg.TYPE_FLOAT)
         if gg.getResultsCount() == 0 then gg.alert("❌ Không tìm thấy!"); gg.setRanges(RANGE_VALUE); return end
-        local opt = gg.choice({"✅ Enable","❌ Disable"}, nil, "Flat Ground General")
-        if opt == 1 then gg.editAll(9999, gg.TYPE_FLOAT); gg.alert("✅ Đã bật!")
+        local opt = gg.choice({"✅","❌ Disable"}, nil, "Flat Ground General")
+        if opt == 1 then gg.editAll(9999, gg.TYPE_FLOAT); gg.alert("✅")
         elseif opt == 2 then gg.editAll(0.7, gg.TYPE_FLOAT); gg.alert("❌ Đã tắt!") end
         gg.setRanges(RANGE_VALUE)
     elseif choice == 2 then toggle("1123132079", 1206423683, 1123132079, gg.REGION_C_ALLOC | gg.REGION_C_DATA | gg.REGION_C_BSS)
@@ -797,30 +835,25 @@ local function flatGroundAdventure()
 end
 
 -- ═══════════════════════════════════════════════════════════════
---  LIB OFFSETS — Vehicle Unlock lib REMOVED, Fake VIP moved to [5]
+--  LIB OFFSETS
 -- ═══════════════════════════════════════════════════════════════
 local libOffsets = {
     ["arm64-v8a"] = {
         [1] = { name = "Auto Win", edits = {
-            {0x11F6AE0, "55008052r"},
-            {0x11F6CFC, "0990321Er"},
-            {0x1D14FBC, "00008052r"},
-            {0x249AEB8, "00000000r"}
+            {0x11F6AE0, "55008052r"},{0x11F6CFC, "0990321Er"},
+            {0x1D14FBC, "00008052r"},{0x249AEB8, "00000000r"}
         }},
         [2] = { name = "Fake Unlock", edits = {{0x16A4FD0, "20008052r"}} },
         [3] = { name = "Free Upgrades", edits = {
-            {0xFA4270, "0090641Er"},
-            {0xFA428C, "0090641Er"}
+            {0xFA4270, "0090641Er"},{0xFA428C, "0090641Er"}
         }},
         [4] = { name = "Force Boss", edits = {
-            {0x16988D4, "00C15FBCr"},
-            {0x1527B6C, "00C15FBCr"}
+            {0x16988D4, "00C15FBCr"},{0x1527B6C, "00C15FBCr"}
         }},
-        [5] = { name = "Fake VIP ", edits = {{0x16AA504, "20008052r"}} },
+        [5] = { name = "Fake VIP", edits = {{0x16AA504, "20008052r"}} },
     },
     ["armeabi-v7a"] = {},
 }
-
 local function getArchKey()
     if archType == 1 then return "arm64-v8a"
     elseif archType == 2 then return "armeabi-v7a"
@@ -828,7 +861,6 @@ local function getArchKey()
     elseif archType == 4 then return "x86" end
     return nil
 end
-
 local function applyLibEdits(entry, backupTable, enable)
     if not entry or not entry.edits or #entry.edits == 0 then return false end
     if not LIB_BASE then gg.alert("❌ LIB_BASE chưa có!"); return false end
@@ -861,7 +893,6 @@ end
 local autoWinState, autoWinBackup = false, nil
 local fakeUnlockState, fakeUnlockBackup = false, nil
 local freeUpgradeState, freeUpgradeBackup = false, nil
-
 local function autoWin()
     if archType == 3 or archType == 4 then gg.alert("❗ Chỉ ARM (ARMV8)!"); return end
     local archKey = getArchKey()
@@ -883,7 +914,6 @@ local function autoWin()
         else gg.alert("❌ Tắt thất bại!") end
     end
 end
-
 local function fakeUnlock()
     if archType == 3 or archType == 4 then gg.alert("❗ Chỉ ARM!"); return end
     local archKey = getArchKey()
@@ -904,7 +934,6 @@ local function fakeUnlock()
         else gg.alert("❌ Tắt thất bại!") end
     end
 end
-
 local function freeUpgrade()
     if archType == 3 or archType == 4 then gg.alert("❗ Chỉ ARM!"); return end
     local archKey = getArchKey()
@@ -915,10 +944,10 @@ local function freeUpgrade()
         "🔧 " .. entry.name .. "\n📦 " .. #entry.edits .. " patches")
     if not choice or choice == 3 then return MainMenu() end
     if choice == 1 then
-        if freeUpgradeState then gg.toast("✅ Đã bật rồi!"); return end
+        if freeUpgradeState then gg.toast("✅"); return end
         freeUpgradeBackup = {}
-        if applyLibEdits(entry, freeUpgradeBackup, true) then freeUpgradeState = true; gg.toast("✅ Free Upgrade BẬT")
-        else freeUpgradeBackup = nil; gg.alert("❌ Bật thất bại!") end
+        if applyLibEdits(entry, freeUpgradeBackup, true) then freeUpgradeState = true; gg.toast("✅")
+        else freeUpgradeBackup = nil; gg.alert("❌") end
     elseif choice == 2 then
         if not freeUpgradeState then gg.alert("❌ Chưa bật!"); return end
         if applyLibEdits(entry, freeUpgradeBackup, false) then freeUpgradeState = false; freeUpgradeBackup = nil; gg.toast("❌ TẮT")
@@ -927,10 +956,9 @@ local function freeUpgrade()
 end
 
 -- ═══════════════════════════════════════════════════════════════
---  FORCE BOSS (NEW)
+--  FORCE BOSS
 -- ═══════════════════════════════════════════════════════════════
 local forceBossState, forceBossBackup, forceBossOrigValue = false, nil, nil
-
 local function forceBoss()
     if archType == 3 or archType == 4 then gg.alert("❗ Chỉ ARM (ARMV8)!"); return end
     local archKey = getArchKey()
@@ -940,11 +968,10 @@ local function forceBoss()
     local entry = libOffsets[archKey][4]
     local choice = gg.choice({"🟢 Bật Force Boss","🔴 Tắt Force Boss","⬅️ Quay lại"}, nil,
         "👹 Force Boss\n📦 " .. #entry.edits .. " patches | " .. archKey ..
-        "\n⚠️ 1.76.1!\nTrạng thái: " .. (forceBossState and "🟢 ON" or "🔴 OFF"))
+        "\nTrạng thái: " .. (forceBossState and "🟢 ON" or "🔴 OFF"))
     if not choice or choice == 3 then return MainMenu() end
-
     if choice == 1 then
-        if forceBossState then gg.toast("✅ Đã bật rồi!"); return end
+        if forceBossState then gg.toast("✅"); return end
         if not checkGameStatus() then return end
         forceBossBackup = {}
         if not applyLibEdits(entry, forceBossBackup, true) then
@@ -973,45 +1000,68 @@ local function forceBoss()
 end
 
 -- ═══════════════════════════════════════════════════════════════
---  FORCE CUP (NEW - EXPERIMENTAL)
+--  FORCE CUP
 -- ═══════════════════════════════════════════════════════════════
-local forceCupActive = false
-
-local function forceCup()
-    local choice = gg.choice({"🟢 Bật Force Cup","🔴 Tắt Force Cup","⬅️ Quay lại"}, nil,
-        "🏁 Force Cup (EXPERIMENTAL)\n⚠️ Có thể hỏng trên bản mới\nTrạng thái: " .. (forceCupActive and "🟢 ON" or "🔴 OFF"))
-    if not choice or choice == 3 then return MainMenu() end
-    if choice == 1 then
-        gg.clearResults(); gg.setRanges(RANGE_VALUE)
-        gg.searchNumber("h B8 1E 85 3F CD CC 4C 3F", gg.TYPE_BYTE)
-        local res = gg.getResults(1); gg.clearResults()
-        if #res == 0 then
-            gg.alert("❌ Không tìm thấy pattern!\n💡 Đua 1 trận rồi thử lại."); return
-        end
-        local currentMap = res[1].address - 0x310
-        local function makeEdits(base)
-            return {
-                {address=base,        flags=gg.TYPE_DWORD, value=1852795934, freeze=true},
-                {address=base+0x4,    flags=gg.TYPE_DWORD, value=1701076839, freeze=true},
-                {address=base+0x8,    flags=gg.TYPE_DWORD, value=1953654131, freeze=true},
-                {address=base+0xC,    flags=gg.TYPE_DWORD, value=1886741343, freeze=true},
-                {address=base+0x10,   flags=gg.TYPE_DWORD, value=0, freeze=true},
-                {address=base+0x14,   flags=gg.TYPE_DWORD, value=0, freeze=true}
+local savedForceCup = {}
+local function forceCupOn()
+    gg.clearResults()
+    gg.setRanges(RANGE_VALUE)
+    gg.searchNumber("h B8 1E 85 3F CD CC 4C 3F", gg.TYPE_BYTE)
+    local res = gg.getResults(1)
+    gg.clearResults()
+    if #res == 0 then
+        gg.alert("❌ Không tìm thấy pattern!\n💡 Đua 1 trận rồi thử lại.")
+        return false
+    end
+    local base = res[1].address
+    local targets = {
+        { addr = base - 0x308, val = 1953063706 },
+        { addr = base - 0x304, val = 1869373305 },
+        { addr = base - 0x300, val = 1667196782 },
+        { addr = base - 0x2FC, val = 28789      },
+        { addr = base - 0x2F8, val = 0          },
+    }
+    savedForceCup = {}
+    local freezeItems = {}
+    for _, t in ipairs(targets) do
+        local orig = gg.getValues({{address = t.addr, flags = gg.TYPE_DWORD}})[1]
+        if orig then
+            savedForceCup[#savedForceCup + 1] = {
+                address = t.addr, flags = gg.TYPE_DWORD, value = orig.value,
             }
         end
-        local e1 = makeEdits(currentMap); gg.setValues(e1); gg.addListItems(e1)
-        local pv = gg.getValues({{address=currentMap+0x18, flags=gg.TYPE_QWORD}})
-        if pv and pv[1] and pv[1].value ~= 0 then
-            local e2 = makeEdits(pv[1].value); gg.setValues(e2); gg.addListItems(e2)
-        else
-            gg.toast("⚠️ Không có next map — đua thêm 1 trận")
-        end
-        forceCupActive = true
-        gg.toast("✅")
-    elseif choice == 2 then
-        gg.clearList(); forceCupActive = false
-        gg.toast("❌ Force Cup TẮT")
+        freezeItems[#freezeItems + 1] = {
+            address = t.addr, flags = gg.TYPE_DWORD, value = t.val, freeze = true,
+        }
     end
+    gg.setValues(freezeItems)
+    gg.addListItems(freezeItems)
+    gg.toast("✅")
+    return true
+end
+local function forceCupOff()
+    if #savedForceCup == 0 then gg.alert("❌ Chưa bật Force Cup!"); return end
+    local unfreeze = {}
+    for _, item in ipairs(savedForceCup) do
+        unfreeze[#unfreeze + 1] = {
+            address = item.address, flags = item.flags, value = item.value, freeze = false,
+        }
+    end
+    gg.removeListItems(unfreeze)
+    gg.setValues(savedForceCup)
+    savedForceCup = {}
+    gg.toast("❌ Force Cup OFF")
+end
+local function forceCup()
+    local isOn = #savedForceCup > 0
+    local c = gg.choice({
+        "🟢 Bật Force Cup", "🔴 Tắt Force Cup", "⬅️ Quay lại"
+    }, nil, "🏁 Force Cup\n⚠️ Chỉ áp dụng cho race hiện tại\nTrạng thái: " .. (isOn and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return MainMenu() end
+    if     c == 1 then forceCupOn()
+    elseif c == 2 then forceCupOff()
+    end
+    return forceCup()
 end
 
 -- ═══════════════════════════════════════════════════════════════
@@ -1084,48 +1134,35 @@ local function vipPassFunc()
 end
 
 -- ═══════════════════════════════════════════════════════════════
---  FAKE VIP (Lib patch — FIXED)
+--  FAKE VIP
 -- ═══════════════════════════════════════════════════════════════
 local fakeVIPState, fakeVIPBackup = false, nil
-
 local function FakeVIPMenu()
     if archType == 3 or archType == 4 then
-        gg.alert("❗ Fake VIP chỉ hỗ trợ ARM (ARMV8)!")
-        return MainMenu()
+        gg.alert("❗ Fake VIP chỉ hỗ trợ ARM (ARMV8)!"); return MainMenu()
     end
     local archKey = getArchKey()
     if not archKey or not libOffsets[archKey] or not libOffsets[archKey][5] then
-        gg.alert("❌ Không có offset Fake VIP cho arch này!")
-        return MainMenu()
+        gg.alert("❌ Không có offset Fake VIP cho arch này!"); return MainMenu()
     end
     local entry = libOffsets[archKey][5]
-    local c = gg.choice({
-        "🟢 Bật Fake VIP",
-        "🔴 Tắt Fake VIP",
-        "⬅️ Quay lại"
-    }, nil,
+    local c = gg.choice({"🟢 Bật Fake VIP","🔴 Tắt Fake VIP","⬅️ Quay lại"}, nil,
         "🎭 Fake VIP (Lib patch)\n📦 " .. #entry.edits .. " patch | " .. archKey ..
-        "\n⚠️ Offset 1.76.1\nTrạng thái: " .. (fakeVIPState and "🟢 ON" or "🔴 OFF"))
+        "\nTrạng thái: " .. (fakeVIPState and "🟢 ON" or "🔴 OFF"))
     if not c or c == 3 then return MainMenu() end
     if c == 1 then
         if fakeVIPState then gg.toast("✅"); return FakeVIPMenu() end
         fakeVIPBackup = {}
         if applyLibEdits(entry, fakeVIPBackup, true) then
-            fakeVIPState = true
-            gg.toast("✅")
-            gg.alert("✅\n\n✅.")
+            fakeVIPState = true; gg.toast("✅"); gg.alert("✅ Đã bật Fake VIP")
         else
-            fakeVIPBackup = nil
-            gg.alert("❌ Patch lib thất bại!\nVersion không khớp 1.76.1?")
+            fakeVIPBackup = nil; gg.alert("❌ Patch lib thất bại!")
         end
     elseif c == 2 then
         if not fakeVIPState then gg.alert("❌ Chưa bật!"); return FakeVIPMenu() end
         if applyLibEdits(entry, fakeVIPBackup, false) then
-            fakeVIPState = false; fakeVIPBackup = nil
-            gg.toast("❌ Fake VIP TẮT")
-        else
-            gg.alert("❌ Tắt thất bại!")
-        end
+            fakeVIPState = false; fakeVIPBackup = nil; gg.toast("❌ TẮT")
+        else gg.alert("❌ Tắt thất bại!") end
     end
     return FakeVIPMenu()
 end
@@ -1228,7 +1265,6 @@ local function MaxVehicles()
     if #edits > 0 then gg.setValues(edits); gg.alert("✅ Đã max " .. #vehicles .. " vehicles!")
     else gg.alert("❌ Không có gì để max!") end
 end
-
 local function MaxMastery()
     if not checkGameStatus() then return end
     gg.alert("⚠️ Dùng Max Vehicles TRƯỚC!")
@@ -1272,7 +1308,6 @@ local function MaxMastery()
     if #writes > 0 then gg.setValues(writes); gg.alert("✅ Đã max " .. successCount .. " masteries!")
     else gg.alert("❌ Không có gì để max!") end
 end
-
 local function MaxParts()
     if not checkGameStatus() then return end
     gg.alert("⚠️ Dùng Max Vehicles TRƯỚC!")
@@ -1321,6 +1356,69 @@ local function MaxParts()
         gg.setValues(upgradeList)
         gg.alert("✅ Đã max " .. math.floor(#upgradeList / 2) .. " parts!")
     else gg.alert("❌ Không có parts để max!") end
+end
+
+-- ═══════════════════════════════════════════════════════════════
+--  PARTS SLOTS EDITOR
+-- ═══════════════════════════════════════════════════════════════
+local function partsSlotsApply(slots)
+    if not checkGameStatus() then return end
+    slots = tonumber(slots)
+    if not slots or slots < 0 or slots > 15 then
+        gg.alert("❌ Giá trị không hợp lệ! Chỉ chấp nhận [0-15]."); return
+    end
+    local vehicleListPtr = gg.getValues({{address = BaseGameStatus + 0xB8, flags = gg.TYPE_QWORD}})[1].value
+    local totalVehicles  = gg.getValues({{address = BaseGameStatus + 0xC0, flags = gg.TYPE_DWORD}})[1].value
+    if not vehicleListPtr or vehicleListPtr == 0 or not totalVehicles or totalVehicles == 0 then
+        gg.alert("❌ Không đọc được vehicle list!\n\n💡 Vào Garage (bấm 1 xe) rồi thử lại."); return
+    end
+    local edits = {}
+    for i = 0, totalVehicles - 1 do
+        local ptrRead = gg.getValues({{address = vehicleListPtr + i * 8, flags = gg.TYPE_QWORD}})
+        if ptrRead and ptrRead[1] and ptrRead[1].value ~= 0 then
+            edits[#edits + 1] = {
+                address = ptrRead[1].value + 0x28,
+                flags   = gg.TYPE_DWORD,
+                value   = slots
+            }
+        end
+    end
+    if #edits > 0 then
+        gg.setValues(edits)
+        gg.alert("✅ Parts Slots = " .. slots ..
+                 "\n📦 Áp dụng cho " .. #edits .. " xe!" ..
+                 "\n\n💡 Restart game để áp dụng hoàn toàn.")
+    else
+        gg.alert("❌")
+    end
+end
+local PartsSlotsMenu
+PartsSlotsMenu = function()
+    local items = {
+        "✏️ Tự nhập giá trị [0-15]",
+        "0️⃣  Set = 0  (tắt hết slots)",
+        "1️⃣  Set = 1","2️⃣  Set = 2","3️⃣  Set = 3  (mặc định)",
+        "4️⃣  Set = 4","5️⃣  Set = 5","6️⃣  Set = 6","7️⃣  Set = 7","8️⃣  Set = 8",
+        "🔟 Set = 10","🔥 Set = 15 (max)","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🧩 Parts Slots Editor\n⚠️ Chạy Max Vehicles TRƯỚC để có hiệu quả!")
+    if not c or c == 13 then return MainMenu() end
+    if c == 1 then
+        local inp = gg.prompt({"Số slots [0-15]:"}, {"3"}, {"number"})
+        if inp then partsSlotsApply(tonumber(inp[1])) end
+    elseif c == 2  then partsSlotsApply(0)
+    elseif c == 3  then partsSlotsApply(1)
+    elseif c == 4  then partsSlotsApply(2)
+    elseif c == 5  then partsSlotsApply(3)
+    elseif c == 6  then partsSlotsApply(4)
+    elseif c == 7  then partsSlotsApply(5)
+    elseif c == 8  then partsSlotsApply(6)
+    elseif c == 9  then partsSlotsApply(7)
+    elseif c == 10 then partsSlotsApply(8)
+    elseif c == 11 then partsSlotsApply(10)
+    elseif c == 12 then partsSlotsApply(15)
+    end
+    return PartsSlotsMenu()
 end
 
 -- ═══════════════════════════════════════════════════════════════
@@ -1374,15 +1472,13 @@ end
 local timeCupsResults = nil
 local timeCupsActive  = false
 local function RemoveMasteryTime()
-    local input = gg.prompt(
-        {"Enter exact Vehicle Name (case-sensitive)\nExamples:\nHILL CLIMBER, SCOOTER, BUS, HILL CLIMBER Mk2, TRACTOR,\nMOTOCROSS, DUNE BUGGY, SPORTS CAR, MONSTER TRUCK, PICKUP TRUCK,\nCHOPPER, MINI TANK, LOWRIDER, SNOWMOBILE, MONOWHEEL, BEAST,\nRALLY CAR, FORMULA, MUSCLE CAR, RACING TRUCK, HOT ROD,\nELECTRIC CAR, SUPERBIKE, LAMBORGHINI, MOONLANDER, ROCK BOUNCER,\nHOVERBIKE, RAIDER, GLIDER, TRUSTY, ATV, SUPER OFFROAD, STOCK CAR"},
-        {""}, {"text"})
+    local input = gg.prompt({"Enter exact Vehicle Name (case-sensitive):"}, {""}, {"text"})
     if not input or not input[1] or input[1] == "" then return end
     local name = input[1]
     gg.clearResults(); gg.setRanges(RANGE_VALUE)
     gg.searchNumber(":" .. name, gg.TYPE_BYTE)
     local allResults = gg.getResults(gg.getResultsCount())
-    if #allResults == 0 then gg.alert("❌ No results for: " .. name .. "\nCheck exact capitalization."); return end
+    if #allResults == 0 then gg.alert("❌ No results for: " .. name); return end
     local targetAddresses = {}
     for _, res in ipairs(allResults) do
         table.insert(targetAddresses, { address = res.address + 0xEF, flags = gg.TYPE_DWORD })
@@ -1390,7 +1486,7 @@ local function RemoveMasteryTime()
     gg.loadResults(targetAddresses)
     gg.refineNumber("1~5", gg.TYPE_DWORD)
     local unlocked = gg.getResults(gg.getResultsCount())
-    if #unlocked == 0 then gg.alert("❌ No mastery data found for this vehicle."); return end
+    if #unlocked == 0 then gg.alert("❌ No mastery data found."); return end
     local patch = {}
     for _, r in ipairs(unlocked) do
         table.insert(patch, {address = r.address + 0x150, flags = gg.TYPE_DWORD, value = 1064972046})
@@ -1399,37 +1495,32 @@ local function RemoveMasteryTime()
         table.insert(patch, {address = r.address + 0x15C, flags = gg.TYPE_DWORD, value = 1263588797})
     end
     gg.setValues(patch); gg.clearResults()
-    gg.alert("✅ Mastery time removed for: " .. name .. "\n\nTap the Mastery logo multiple times to complete!")
+    gg.alert("✅ Mastery time removed for: " .. name)
 end
 local function SetCupsCountdown()
-    local input = gg.prompt({"Set Cups Countdown (seconds)\nAllowed: 0 – 10"}, {"3"}, {"number"})
+    local input = gg.prompt({"Set Cups Countdown (seconds 0-10):"}, {"3"}, {"number"})
     if not input then return end
     local val = tonumber(input[1])
     if not val or val < 0 or val > 10 then
-        gg.alert("❌ Invalid input! Enter a number between 0 and 10.")
-        return SetCupsCountdown()
+        gg.alert("❌ Invalid input!"); return SetCupsCountdown()
     end
     if not timeCupsActive or not timeCupsResults then
         gg.clearResults(); gg.setRanges(gg.REGION_C_BSS)
         gg.searchNumber("3", gg.TYPE_FLOAT)
         local count = gg.getResultCount()
-        if count == 0 then gg.alert("❌ No results found in C_BSS."); gg.setRanges(RANGE_VALUE); return end
-        timeCupsResults = gg.getResults(count); timeCupsActive  = true
+        if count == 0 then gg.alert("❌ No results found."); gg.setRanges(RANGE_VALUE); return end
+        timeCupsResults = gg.getResults(count); timeCupsActive = true
     end
     local newValues = {}
     for i, res in ipairs(timeCupsResults) do
         newValues[i] = { address = res.address, flags = gg.TYPE_FLOAT, value = val }
     end
     gg.setValues(newValues); gg.setRanges(RANGE_VALUE)
-    gg.alert("✅ Cups Countdown set to " .. val .. " seconds")
+    gg.alert("✅ Cups Countdown = " .. val .. "s")
 end
 local function MasteryCupsMenu()
     while true do
-        local c = gg.choice({
-            "⏲️ Remove Mastery Time",
-            "⏱️ Set Countdown for Cups",
-            "⬅️ Quay lại",
-        }, nil, "🕹️ Mastery & Cups")
+        local c = gg.choice({"⏲️ Remove Mastery Time","⏱️ Set Countdown for Cups","⬅️ Quay lại"}, nil, "🕹️ Mastery & Cups")
         if not c or c == 3 then return MainMenu() end
         if c == 1 then RemoveMasteryTime()
         elseif c == 2 then SetCupsCountdown() end
@@ -1441,18 +1532,14 @@ end
 -- ═══════════════════════════════════════════════════════════════
 local function EventMenu()
     if not checkGameStatus() then return end
-    local choice = gg.choice({
-        "🛒 Free Purchases (Event)",
-        "💎 Add Currency (Coins/Gems)",
-        "⬅️ Quay lại"
-    }, nil, "🎉 Làm việc trong Event tab của game")
+    local choice = gg.choice({"🛒 Free Purchases (Event)","💎 Add Currency (Coins/Gems)","⬅️ Quay lại"}, nil, "🎉 Event tab")
     if not choice or choice == 3 then return end
     if choice == 1 then
         gg.clearResults(); gg.setRanges(gg.REGION_C_ALLOC)
         gg.searchNumber("60;600;150", gg.TYPE_FLOAT)
         if gg.getResultsCount() == 0 then gg.alert("❌"); return end
         gg.editAll(0, gg.TYPE_FLOAT); gg.clearResults()
-        gg.alert("✅ Đã bật!\nThoát Event tab rồi vào lại.")
+        gg.alert("✅ Đã bật!")
     elseif choice == 2 then
         local cur = gg.prompt({"Chọn (1=Coins, 2=Gems):","Số lượng:"}, {1, 50000}, {"number","number"})
         if not cur then return end
@@ -1477,7 +1564,6 @@ local TE = {
     EditMatchmakingReq=0x123, EditTeamTicketJoin=0x13F, EditTicketRefill=0x147,
     EditRetryDisable=0x157, EditTeamDurationStart=0x1FB, EditTeamDurationEnd=0x1FF,
     SetVehicleLimit1=0x437, SetVehicleLimit2=0x43F, SetVehicleLimit3=0x447,
-    AllowVehicleList1=0x44F, AllowVehicleList2=0x457, AllowVehicleList3=0x45F,
     AnalyzeGameMode=0x4DF,
     EventScoreCheck1=0x1B0, EventScoreCheck2=0x1C8, EventScoreCheck3=0x1E0,
 }
@@ -1503,7 +1589,7 @@ local function TE_verifyBase(base)
     return true
 end
 local function TE_searchEvent()
-    local input = gg.prompt({"Tên Event (VD: :Hooked on a Wheelin'):"}, {""}, {"text"})
+    local input = gg.prompt({"Tên Event:"}, {""}, {"text"})
     if not input or input[1] == "" then gg.toast("⚠️ Trống!"); return end
     local label = input[1]; local len = #label
     local word = label:match("^(%S+)") or label
@@ -1527,31 +1613,8 @@ local function TE_searchEvent()
                 end
             end
         end
-        gg.clearResults(); gg.toast("✅ Added " .. added .. " cho: " .. label); return
+        gg.clearResults(); gg.toast("✅ Added " .. added); return
     end
-    for _, rr in ipairs(refineResults) do
-        local stringAddress = rr.address
-        gg.clearResults(); gg.setRanges(RANGE_VALUE)
-        gg.searchNumber(stringAddress, gg.TYPE_QWORD)
-        local pCount = gg.getResultsCount()
-        if pCount > 0 then
-            for _, p in ipairs(gg.getResults(pCount)) do
-                local base = p.address - 0xF
-                local checkAddr = p.address - 0x10
-                local v = gg.getValues({{address = checkAddr, flags = gg.TYPE_DWORD}})
-                if v and v[1] and v[1].value >= 0 and v[1].value <= 100 then
-                    if not TE_History[label].verified[base] then
-                        if TE_verifyBase(base) then
-                            TE_History[label].verified[base] = true
-                            TE_History[label].results[#TE_History[label].results+1] = {address = base}
-                            added = added + 1
-                        end
-                    end
-                end
-            end
-        end
-    end
-    gg.toast("✅ Pointer-verified " .. added .. " cho: " .. label)
     gg.clearResults()
 end
 local function TE_applyEdits(base, selectedEdits)
@@ -1559,23 +1622,7 @@ local function TE_applyEdits(base, selectedEdits)
     for _, idx in ipairs(selectedEdits) do
         if idx == 1 then batch[#batch+1] = {address=base+TE.EditMatchmakingReq, flags=gg.TYPE_DWORD, value=1}
         elseif idx == 2 then batch[#batch+1] = {address=base+TE.EditTeamTicketJoin, flags=gg.TYPE_DWORD, value=0}
-        elseif idx == 3 then
-            local orig = TE_readOne(base + TE.EditTicketRefill, gg.TYPE_DWORD)
-            if orig then
-                gg.setValues({{address=base+TE.EditTicketRefill, flags=gg.TYPE_DWORD, value=0}})
-                gg.sleep(300)
-                gg.setValues({{address=base+TE.EditTicketRefill, flags=gg.TYPE_DWORD, value=orig}})
-            end
         elseif idx == 4 then batch[#batch+1] = {address=base+TE.EditRetryDisable, flags=gg.TYPE_DWORD, value=-1}
-        elseif idx == 5 then
-            if not TE_DurationInput then
-                local ui = gg.prompt({"Duration (HOURS) [1;48]:"}, {"1"}, {"number"})
-                if not ui then return false end
-                TE_DurationInput = tonumber(ui[1]) or 1
-            end
-            local fv = 3600 * TE_DurationInput
-            batch[#batch+1] = {address=base+TE.EditTeamDurationStart, flags=gg.TYPE_DWORD, value=fv}
-            batch[#batch+1] = {address=base+TE.EditTeamDurationEnd, flags=gg.TYPE_DWORD, value=fv}
         end
     end
     if #batch > 0 then if not pcall(function() gg.setValues(batch) end) then return false end end
@@ -1589,8 +1636,8 @@ local function TE_enableEvent()
         local t = {}; for _ = 1, #labels do t[#t+1] = "checkbox" end; return t
     end)())
     if not eventPrompt then return end
-    local editNames = {"Matchmaking (1 player)","Team ticket unlimited","Refill Tickets [T-E]","Retry Disable","Duration [Leaders]"}
-    local editPrompt = gg.prompt(editNames, {}, {"checkbox","checkbox","checkbox","checkbox","checkbox"})
+    local editNames = {"Matchmaking (1 player)","Team ticket unlimited","Retry Disable"}
+    local editPrompt = gg.prompt(editNames, {}, {"checkbox","checkbox","checkbox"})
     if not editPrompt then return end
     local sel = {}
     for k, v in pairs(editPrompt) do if v then sel[#sel+1] = k end end
@@ -1602,36 +1649,10 @@ local function TE_enableEvent()
                 if TE_applyEdits(r.address, sel) then cnt = cnt + 1 end
             end
             hist.is_enabled = cnt > 0
-            gg.toast(string.format("✅ Enabled %d/%d cho \"%s\"", cnt, #hist.results, label))
+            gg.toast(string.format("✅ %d/%d cho \"%s\"", cnt, #hist.results, label))
         end
     end
     gg.clearResults(); gg.clearList()
-end
-local function TE_disableEvent()
-    if not next(TE_History) then gg.toast("⚠️ Chưa search event!"); return end
-    local labels = {}
-    for label, entry in pairs(TE_History) do if entry.is_enabled then labels[#labels+1] = label end end
-    if #labels == 0 then gg.toast("❌ Không có event nào bật!"); return end
-    local sel = gg.prompt(labels, {}, (function()
-        local t = {}; for _ = 1, #labels do t[#t+1] = "checkbox" end; return t
-    end)())
-    if not sel then return end
-    for i, isSelected in ipairs(sel) do
-        if isSelected then
-            local label = labels[i]; local hist = TE_History[label]
-            for _, r in ipairs(hist.results) do
-                gg.setValues({
-                    {address=r.address+TE.EditMatchmakingReq, flags=gg.TYPE_DWORD, value=5},
-                    {address=r.address+TE.EditTeamTicketJoin, flags=gg.TYPE_DWORD, value=1},
-                    {address=r.address+TE.EditRetryDisable, flags=gg.TYPE_DWORD, value=1},
-                    {address=r.address+TE.EditTeamDurationStart, flags=gg.TYPE_DWORD, value=172800},
-                    {address=r.address+TE.EditTeamDurationEnd, flags=gg.TYPE_DWORD, value=172800},
-                })
-            end
-            hist.is_enabled = false
-            gg.toast("⚠️ Disabled " .. label)
-        end
-    end
 end
 local function TE_showLogs()
     if not next(TE_History) then gg.alert("⚠️ Chưa có history!"); return end
@@ -1641,95 +1662,15 @@ local function TE_showLogs()
     end
     gg.alert(table.concat(lines, "\n"))
 end
-local function TE_setVehicleLimit()
-    if not next(TE_History) then gg.toast("⚠️ Chưa search event!"); return end
-    local labels = {}
-    for label, _ in pairs(TE_History) do labels[#labels+1] = label end
-    local sel = gg.prompt(labels, {}, (function()
-        local t = {}; for _ = 1, #labels do t[#t+1] = "checkbox" end; return t
-    end)())
-    if not sel then return end
-    local inp = gg.prompt({"Limit:"}, {"1"}, {"number"})
-    if not inp then return end
-    local limitVal = tonumber(inp[1]) or 1
-    for i, isSelected in ipairs(sel) do
-        if isSelected then
-            local hist = TE_History[labels[i]]
-            for addr, _ in pairs(hist.verified) do
-                local lStart = TE_readOne(addr + TE.SetVehicleLimit1, gg.TYPE_QWORD)
-                local lEnd   = TE_readOne(addr + TE.SetVehicleLimit2, gg.TYPE_QWORD)
-                if lStart and lEnd and lStart ~= 0 then
-                    local count = math.floor((lEnd - lStart) / 4)
-                    local batch = {}
-                    for j = 0, count-1 do
-                        batch[#batch+1] = {address=lStart + j*4, flags=gg.TYPE_DWORD, value=limitVal}
-                    end
-                    gg.setValues(batch)
-                end
-            end
-            gg.toast("✅ Updated: " .. labels[i])
-        end
-    end
-end
-local function TE_analyzeGameMode()
-    if not next(TE_History) then gg.toast("⚠️ Chưa search!"); return end
-    local labels = {}
-    for label, _ in pairs(TE_History) do labels[#labels+1] = label end
-    local ch = gg.choice(labels, nil, "Event để phân tích:")
-    if not ch then return end
-    local label = labels[ch]; local hist = TE_History[label]
-    local inp = gg.prompt({"Total Modes [1-5]:"}, {"1"}, {"number"})
-    if not inp then return end
-    local jumps = math.min(math.max(math.floor(tonumber(inp[1]) or 1), 1), 5)
-    local jumpOffsets = {0, 0x8, 0x10, 0x18, 0x20}
-    local modeInfo = {}
-    for _, entry in ipairs(hist.results) do
-        if entry and entry.address then
-            local basePtr = TE_readOne(entry.address + TE.AnalyzeGameMode, gg.TYPE_QWORD)
-            if basePtr and basePtr ~= 0 then
-                for i = 1, jumps do
-                    local jumpPtr = TE_readOne(basePtr + jumpOffsets[i], gg.TYPE_QWORD)
-                    if jumpPtr and jumpPtr ~= 0 then
-                        local function readF(o)
-                            local p = TE_readOne(jumpPtr + o, gg.TYPE_QWORD)
-                            if not p or p == 0 then return 0 end
-                            return TE_readOne(p, gg.TYPE_FLOAT) or 0
-                        end
-                        local v198, v1B0, v1C8 = readF(TE.EventScoreCheck1), readF(TE.EventScoreCheck2), readF(TE.EventScoreCheck3)
-                        if not (v198 == 0 and v1B0 == 0 and v1C8 == 0) then
-                            modeInfo[#modeInfo+1] = {jump=i, mode=(v1B0 == 0) and "Distance Mode" or "Time Attack Mode",
-                                t198=v198, t1B0=v1B0, t1C8=v1C8}
-                        end
-                    end
-                end
-            end
-        end
-    end
-    if #modeInfo == 0 then gg.toast("❌ Không có mode hợp lệ!"); return end
-    local msg = "📌 Game Mode Analysis\nEvent: " .. label .. "\n\n"
-    for _, m in ipairs(modeInfo) do
-        msg = msg .. string.format("Mode %d (%s)\n", m.jump, m.mode)
-        if m.mode == "Distance Mode" then
-            msg = msg .. string.format("Distance → %.2f\nMax Points → %.2f\n\n", m.t198, m.t1C8)
-        else
-            msg = msg .. string.format("Min → %.2f\nMax → %.2f\nMax Points → %.2f\n\n", m.t198, m.t1B0, m.t1C8)
-        end
-    end
-    gg.alert(msg)
-end
 local function TeamEventMenu()
     local menu = {
-        "🔍 SEARCH EVENT (BƯỚC 1)","✅ ENABLE TEAM EVENT","❌ DISABLE TEAM EVENT",
-        "📝 SHOW LOGS","🥀 Set Vehicle Limit","🔬 GAME MODES INFO","⬅️ Quay lại"
+        "🔍 SEARCH EVENT","✅ ENABLE TEAM EVENT","📝 SHOW LOGS","⬅️ Quay lại"
     }
     local choice = gg.choice(menu, nil, "🎯 TEAM EVENT")
-    if choice == nil or choice == 7 then return MainMenu() end
+    if choice == nil or choice == 4 then return MainMenu() end
     if choice == 1 then TE_searchEvent()
     elseif choice == 2 then TE_enableEvent()
-    elseif choice == 3 then TE_disableEvent()
-    elseif choice == 4 then TE_showLogs()
-    elseif choice == 5 then TE_setVehicleLimit()
-    elseif choice == 6 then TE_analyzeGameMode() end
+    elseif choice == 3 then TE_showLogs() end
     return TeamEventMenu()
 end
 
@@ -1759,7 +1700,7 @@ local function gd_vehiclePicker()
     local list = gd_allVehicles()
     local labels = {}
     for i, v in ipairs(list) do labels[i] = string.format("%2d. %s", i, v) end
-    local pick = gg.choice(labels, nil, "🚗 Chọn xe để xem chi tiết")
+    local pick = gg.choice(labels, nil, "🚗 Chọn xe")
     if not pick then return end
     gd_showVehicleInfo(list[pick])
     return gd_vehiclePicker()
@@ -1772,24 +1713,8 @@ local function gd_showByRarity()
     end
     gg.alert(msg, "OK")
 end
-local function gd_showUnlockByMethod()
-    local labels = {}
-    local keys = {}
-    for k, _ in pairs(game_data.vehicles) do keys[#keys+1] = k end
-    table.sort(keys)
-    for i, k in ipairs(keys) do
-        labels[i] = string.format("%s (%d xe)", k:gsub("^Unlock",""):gsub("Vehicles$",""), #game_data.vehicles[k])
-    end
-    labels[#labels+1] = "⬅️ Quay lại"
-    local pick = gg.choice(labels, nil, "🔓 Xe theo cách mở khóa")
-    if not pick or pick == #labels then return end
-    local key = keys[pick]; local list = game_data.vehicles[key]
-    local msg = "🔓 " .. key .. " (" .. #list .. ")\n\n"
-    for i, v in ipairs(list) do msg = msg .. string.format("%2d. %s\n", i, v) end
-    gg.alert(msg, "OK")
-end
 local function gd_searchByName()
-    local inp = gg.prompt({"🔎 Nhập tên xe (VD: DUNE):"}, {""}, {"text"})
+    local inp = gg.prompt({"🔎 Nhập tên xe:"}, {""}, {"text"})
     if not inp or inp[1] == "" then return end
     local q = inp[1]:upper()
     local hits = {}
@@ -1799,30 +1724,13 @@ local function gd_searchByName()
     if #hits == 0 then gg.alert("❌ Không có xe nào khớp: " .. q)
     else gg.alert("🔎 Kết quả (" .. #hits .. "):\n\n" .. table.concat(hits, "\n"), "OK") end
 end
-local function gd_stats()
-    local totalVehicles = #game_data.gameStatusVehicles
-    local totalTuneEntries = 0
-    for _, tunes in pairs(game_data.gameStatusTunesParts) do
-        for _, list in ipairs(tunes) do totalTuneEntries = totalTuneEntries + #list end
-    end
-    local msg = string.format(
-        "📊 GAME DATA STATS\n\n🚗 Total vehicles: %d\n🎵 Tune entries:   %d\n📇 Vehicle table entries: %d\n\n" ..
-        "Rarity values: %s\nRarity labels: %s",
-        totalVehicles, totalTuneEntries,
-        (function() local c=0; for _ in pairs(game_data.gameStatusTunesParts) do c=c+1 end; return c end)(),
-        table.concat(game_data.rarityValue, ", "), table.concat(game_data.rarityLabel, ", ")
-    )
-    gg.alert(msg, "OK")
-end
 local function GameDataMenu()
-    local menu = {"🚗 Xem chi tiết 1 xe","📊 Danh sách toàn bộ xe","🔓 Xe theo cách mở khóa","🔎 Tìm xe theo tên","📈 Stats Game Data","⬅️ Quay lại"}
+    local menu = {"🚗 Xem chi tiết 1 xe","📊 Danh sách toàn bộ","🔎 Tìm xe theo tên","⬅️ Quay lại"}
     local pick = gg.choice(menu, nil, "📚 GAME DATA BROWSER")
-    if not pick or pick == 6 then return MainMenu() end
+    if not pick or pick == 4 then return MainMenu() end
     if pick == 1 then gd_vehiclePicker()
     elseif pick == 2 then gd_showByRarity()
-    elseif pick == 3 then gd_showUnlockByMethod()
-    elseif pick == 4 then gd_searchByName()
-    elseif pick == 5 then gd_stats() end
+    elseif pick == 3 then gd_searchByName() end
     return GameDataMenu()
 end
 
@@ -1915,9 +1823,9 @@ local function ADZ_PlayerEdit(i)
     elseif i==11 then local x=gg.prompt({"Wins:"},{p.wins},{"number"}); if x then sD(FP+O.wins,tonumber(x[1])) end
     elseif i==12 then local x=gg.prompt({"Legend (x1000):"},{string.format("%.0f",p.legend)},{"number"}); if x then sF(FP+O.legend,tonumber(x[1])*0.001) end
     elseif i==13 then local x=gg.prompt({"Clicks:"},{p.clicks},{"number"}); if x then sD(FP+O.hit,tonumber(x[1])) end
-    elseif i==14 then gg.copyText(p.chal); gg.alert("Copied ChalID: "..p.chal)
-    elseif i==15 then gg.copyText(p.team); gg.alert("Copied TeamID: "..p.team)
-    elseif i==16 then gg.copyText(p.guid); gg.alert("Copied GUID: "..p.guid)
+    elseif i==14 then gg.copyText(p.chal); gg.alert("Copied: "..p.chal)
+    elseif i==15 then gg.copyText(p.team); gg.alert("Copied: "..p.team)
+    elseif i==16 then gg.copyText(p.guid); gg.alert("Copied: "..p.guid)
     elseif i==17 then local x=gg.prompt({"WinLink:"},{p.winLink},{"number"}); if x then sD(FP+O.winLink,tonumber(x[1])) end
     elseif i==18 then local x=gg.prompt({"WinGame:"},{p.winGame},{"number"}); if x then sD(FP+O.winGame,tonumber(x[1])) end
     elseif i==19 then local ev=rQ(FP+O.eventTk); if ev~=0 then local x=gg.prompt({"EvPoints:"},{p.evPoints},{"number"}); if x then sD(ev+O.evPoints,tonumber(x[1])) end end
@@ -1925,9 +1833,9 @@ local function ADZ_PlayerEdit(i)
     elseif i==21 then local x=gg.prompt({"EvJoin:"},{p.evJoin},{"number"}); if x then sD(FP+O.evJoin,tonumber(x[1])) end
     elseif i==22 then local x=gg.prompt({"EvScore:"},{p.evScore},{"number"}); if x then sD(FP+O.evScore,tonumber(x[1])) end
     elseif i==23 then local x=gg.prompt({"EvDone:"},{p.evDone},{"number"}); if x then sD(FP+O.evDone,tonumber(x[1])) end
-    elseif i==24 then gg.copyText(p.device); gg.alert("Copied Device: "..p.device)
-    elseif i==25 then gg.copyText(p.android); gg.alert("Copied Android: "..p.android)
-    elseif i==26 then gg.copyText(p.month); gg.alert("Copied Month: "..p.month)
+    elseif i==24 then gg.copyText(p.device); gg.alert("Copied: "..p.device)
+    elseif i==25 then gg.copyText(p.android); gg.alert("Copied: "..p.android)
+    elseif i==26 then gg.copyText(p.month); gg.alert("Copied: "..p.month)
     elseif i==27 then local x=gg.prompt({"King (x1000):"},{string.format("%.0f",p.king)},{"number"}); if x then sF(FP+O.king,tonumber(x[1])*0.001) end
     elseif i==28 then local x=gg.prompt({"Shard value:"},{p.shard},{"number"})
         if x then local dd=rQ(FP+O.shard1)
@@ -1939,7 +1847,7 @@ local function ADZ_PlayerEdit(i)
     elseif i==30 then local x=gg.prompt({"Special tickets:"},{p.special},{"number"}); if x then sD(FP+O.special,tonumber(x[1])+1) end
     elseif i==31 then local x=gg.prompt({"Garage level:"},{p.garage},{"number"}); if x then sD(FP+O.garage,tonumber(x[1])) end
     elseif i==32 then local x=gg.prompt({"Adv rank:"},{string.format("%.2f",p.advRank)},{"number"}); if x then sF(FP+O.advRank,tonumber(x[1])) end
-    elseif i==33 then gg.copyText(p.cloud); gg.alert("Copied CloudID: "..p.cloud)
+    elseif i==33 then gg.copyText(p.cloud); gg.alert("Copied: "..p.cloud)
     elseif i==34 then local x=gg.prompt({"Adv tokens:"},{p.advTk},{"number"}); if x and p.advRaw~=0 then sD(p.advRaw+0x20,tonumber(x[1])+1) end
     elseif i==35 then local x=gg.prompt({"Comm tickets:"},{p.comm},{"number"}); if x and p.commRaw~=0 then sD(p.commRaw+O.comm2,tonumber(x[1])) end
     elseif i==36 then local x=gg.prompt({"Fleet tickets:"},{p.fleet},{"number"}); if x and p.fleetRaw~=0 then sD(p.fleetRaw+O.fleet2,tonumber(x[1])) end
@@ -2094,7 +2002,7 @@ function ADZ_SuperPartsMenu()
     items[#items+1] = "♾️ Infinite Nitro (in-game)"
     items[#items+1] = "🔄 Reload parts"
     items[#items+1] = "⬅️ Quay lại"
-    local c = gg.choice(items, nil, "🔩 SUPER PARTS — chọn thông số")
+    local c = gg.choice(items, nil, "🔩 SUPER PARTS")
     if not c or c == #items then return MainMenu() end
     if c == #items - 2 then
         gg.clearResults(); gg.setRanges(RANGE_VALUE)
@@ -2124,7 +2032,6 @@ end
 local _evShop = nil
 local _resourcePool = nil
 local _rewardAmount = 100
-
 local function ADZ_FindEventShop()
     gg.clearResults(); gg.setRanges(RANGE_VALUE)
     gg.searchNumber("21600", gg.TYPE_DWORD)
@@ -2169,297 +2076,6 @@ local function ADZ_FreeEventItems(sa)
     if #writes>0 then gg.setValues(writes) end
     return ids
 end
-local function ADZ_InjectCharSkin(sa, itemIdx)
-    local ids = ADZ_FreeEventItems(sa)
-    local zp = yj.Allzeropages(); if not zp then return end
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("h 0C 43 41 52 52 49 45 00", gg.TYPE_BYTE)
-    gg.refineNumber("12", gg.TYPE_BYTE)
-    local r = gg.getResults(gg.getResultsCount())
-    if #r==0 then gg.alert("❌ CARRIE not found"); return end
-    local rds = {}
-    for _, v in ipairs(r) do rds[#rds+1] = {address=v.address-0x8,flags=gg.TYPE_DWORD} end
-    local vs = gg.getValues(rds); local cands = {}
-    for i, v in ipairs(vs) do if v.value==1 then cands[#cands+1] = r[i].address+0x70 end end
-    if #cands==0 then gg.alert("❌ No CARRIE"); return end
-    local prds = {}
-    for _, a in ipairs(cands) do prds[#prds+1] = {address=a,flags=gg.TYPE_QWORD} end
-    local pvs = gg.getValues(prds); local tgt
-    for i, pv in ipairs(pvs) do
-        if pv.value~=0 and readStringAt(pv.value,64)=="textures/drivers/common/carrie/carrie_torso.png" then
-            tgt = cands[i]-0xB0; break
-        end
-    end
-    if not tgt then gg.alert("❌ Skin ptr"); return end
-    local sp = gg.getValues({{address=tgt,flags=gg.TYPE_QWORD}})[1].value
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber(sp, gg.TYPE_QWORD)
-    local refs = gg.getResults(gg.getResultsCount()); if #refs==0 then return end
-    local rr, ww = {}, {}
-    for _, ref in ipairs(refs) do for off=0x8,0x1C,4 do rr[#rr+1]={address=ref.address+off,flags=gg.TYPE_DWORD} end end
-    local rv = gg.getValues(rr)
-    for i, v in ipairs(rv) do ww[i] = {address=zp+(i-1)*4,flags=gg.TYPE_DWORD,value=v.value} end
-    gg.setValues(ww); local n = #ww/6
-    gg.setValues({{address=ids[itemIdx]+0x60,flags=gg.TYPE_QWORD,value=zp},
-                  {address=ids[itemIdx]+0x68,flags=gg.TYPE_QWORD,value=zp+n*24},
-                  {address=ids[itemIdx]+0x70,flags=gg.TYPE_QWORD,value=zp+n*24}})
-    gg.toast("✅ "..n.." char skins → item #"..itemIdx)
-end
-local function ADZ_InjectAnim(sa, itemIdx)
-    local ids = ADZ_FreeEventItems(sa)
-    local zp = yj.Allzeropages(); if not zp then return end
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("h 0E 42 49 47 20 53 41 44", gg.TYPE_BYTE)
-    gg.refineNumber('14', gg.TYPE_BYTE)
-    local rs = gg.getResults(gg.getResultsCount()); local t
-    for _, v in ipairs(rs) do
-        if gg.getValues({{address=v.address-0x38,flags=gg.TYPE_DWORD}})[1].value==1734959630 then
-            t = v.address-0x40; break
-        end
-    end
-    if not t then gg.alert("❌ Anim not found"); return end
-    local ap = gg.getValues({{address=t,flags=gg.TYPE_QWORD}})[1].value
-    if ap==0 then return end
-    gg.clearResults(); gg.searchNumber(ap, gg.TYPE_QWORD)
-    local refs = gg.getResults(gg.getResultsCount())
-    local rr, ww = {}, {}
-    for _, ref in ipairs(refs) do for off=0x8,0x1C,4 do rr[#rr+1]={address=ref.address+off,flags=gg.TYPE_DWORD} end end
-    local rv = gg.getValues(rr)
-    for i, v in ipairs(rv) do ww[i] = {address=zp+(i-1)*4,flags=gg.TYPE_DWORD,value=v.value} end
-    gg.setValues(ww); local n = #ww/6
-    gg.setValues({{address=ids[itemIdx]+0x78,flags=gg.TYPE_QWORD,value=zp},
-                  {address=ids[itemIdx]+0x80,flags=gg.TYPE_QWORD,value=zp+n*24},
-                  {address=ids[itemIdx]+0x88,flags=gg.TYPE_QWORD,value=zp+n*24}})
-    gg.toast("✅ "..n.." anims → item #"..itemIdx)
-end
-local function ADZ_InjectVehSkin(sa, itemIdx)
-    local ids = ADZ_FreeEventItems(sa)
-    local zp = yj.Allzeropages(); if not zp then return end
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("h 1E 6A 65 65 70 5F 68 75 65 5F 76 69 6F 6C 65 74", gg.TYPE_BYTE)
-    gg.refineNumber('30', gg.TYPE_BYTE)
-    local rs = gg.getResults(gg.getResultsCount()); local t
-    for _, v in ipairs(rs) do
-        if gg.getValues({{address=v.address+0x18,flags=gg.TYPE_DWORD}})[1].value==1701145096 then
-            t = v.address-0x8; break
-        end
-    end
-    if not t then gg.alert("❌ VehSkin not found"); return end
-    local sp = gg.getValues({{address=t,flags=gg.TYPE_QWORD}})[1].value
-    if sp==0 then return end
-    gg.clearResults(); gg.searchNumber(sp, gg.TYPE_QWORD)
-    local refs = gg.getResults(gg.getResultsCount())
-    local rr, ww = {}, {}
-    for _, ref in ipairs(refs) do
-        for _, off in ipairs({0x20,0x24,0x28,0x2C,0x30,0x34,0x8,0xC,0x10,0x14,0x18,0x1C}) do
-            rr[#rr+1] = {address=ref.address+off,flags=gg.TYPE_DWORD}
-        end
-    end
-    local rv = gg.getValues(rr)
-    for i, v in ipairs(rv) do ww[i] = {address=zp+(i-1)*4,flags=gg.TYPE_DWORD,value=v.value} end
-    gg.setValues(ww); local n = #ww/12
-    gg.setValues({{address=ids[itemIdx]+0x90,flags=gg.TYPE_QWORD,value=zp},
-                  {address=ids[itemIdx]+0x98,flags=gg.TYPE_QWORD,value=zp+n*48},
-                  {address=ids[itemIdx]+0xA0,flags=gg.TYPE_QWORD,value=zp+n*48}})
-    gg.toast("✅ "..n.." veh skins → item #"..itemIdx)
-end
-local function ADZ_InjectTireSkin(sa, itemIdx)
-    local ids = ADZ_FreeEventItems(sa)
-    local zp = yj.Allzeropages(); if not zp then return end
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("h 0A 77 68 65 65 6C 00 00", gg.TYPE_BYTE)
-    gg.refineNumber("10", gg.TYPE_BYTE)
-    local w = gg.getResults(gg.getResultsCount())
-    if #w==0 then gg.alert("❌ WHEEL not found"); return end
-    local wbase = w[1].address; local waddrs = {}
-    for k = 0, 5 do waddrs[#waddrs+1] = wbase + k*4 end
-    gg.clearResults()
-    gg.searchNumber("h 1E 6A 65 65 70 5F 68 75 65 5F 76 69 6F 6C 65 74", gg.TYPE_BYTE)
-    gg.refineNumber('30', gg.TYPE_BYTE)
-    local rs = gg.getResults(gg.getResultsCount()); local t
-    for _, v in ipairs(rs) do
-        if gg.getValues({{address=v.address+0x18,flags=gg.TYPE_DWORD}})[1].value==1701145096 then
-            t = v.address-0x8; break
-        end
-    end
-    if not t then return end
-    local sp = gg.getValues({{address=t,flags=gg.TYPE_QWORD}})[1].value
-    if sp==0 then return end
-    gg.clearResults(); gg.searchNumber(sp, gg.TYPE_QWORD)
-    local refs = gg.getResults(gg.getResultsCount())
-    local rr, ww = {}, {}
-    for _, ref in ipairs(refs) do
-        for _, off in ipairs({0x20,0x24,0x28,0x2C,0x30,0x34}) do rr[#rr+1]={address=ref.address+off,flags=gg.TYPE_DWORD} end
-        for _, wa in ipairs(waddrs) do rr[#rr+1]={address=wa,flags=gg.TYPE_DWORD} end
-        for _, off in ipairs({0x8,0xC,0x10,0x14,0x18,0x1C}) do rr[#rr+1]={address=ref.address+off,flags=gg.TYPE_DWORD} end
-    end
-    local rv = gg.getValues(rr)
-    for i, v in ipairs(rv) do ww[i] = {address=zp+(i-1)*4,flags=gg.TYPE_DWORD,value=v.value} end
-    gg.setValues(ww); local n = #ww/18
-    gg.setValues({{address=ids[itemIdx]+0xA8,flags=gg.TYPE_QWORD,value=zp},
-                  {address=ids[itemIdx]+0xB0,flags=gg.TYPE_QWORD,value=zp+n*72},
-                  {address=ids[itemIdx]+0xB8,flags=gg.TYPE_QWORD,value=zp+n*72}})
-    gg.toast("✅ "..n.." tire skins → item #"..itemIdx)
-end
-local function ADZ_EventGetParts(sa, qty)
-    local ids = ADZ_FreeEventItems(sa); if not ids[1] then return end
-    local zp = yj.Allzeropages(); local cfg = yj.Allzeropages()
-    if not zp or not cfg then return end
-    for i, v in ipairs({0,1,2,3,4,999999}) do
-        gg.setValues({{address=cfg+(i-1)*4,flags=gg.TYPE_DWORD,value=v}})
-    end
-    local wv = {}
-    for _ = 1, qty do
-        for _, off in ipairs({0,0,0,0,0,0,0x14,0x4,0,0,0,0,0,0,0x14,0x8,0,0,0,0,0,0,0x14,0xC,0,0,0,0,0,0,0x14,0x10}) do
-            wv[#wv+1] = {address=cfg+off,flags=gg.TYPE_DWORD}
-        end
-    end
-    local rv = gg.getValues(wv); local ww = {}
-    for i, v in ipairs(rv) do ww[i] = {address=zp+(i-1)*4,flags=gg.TYPE_DWORD,value=v.value} end
-    gg.setValues(ww)
-    gg.setValues({{address=ids[1]+0x150,flags=gg.TYPE_QWORD,value=zp},
-                  {address=ids[1]+0x158,flags=gg.TYPE_QWORD,value=zp+qty*128},
-                  {address=ids[1]+0x160,flags=gg.TYPE_QWORD,value=zp+qty*128}})
-    gg.toast("✅ Parts x"..qty.." → item #1")
-end
-local function ADZ_EventUnlockAllVehicles(sa)
-    local ids = ADZ_FreeEventItems(sa); if not ids[1] then return end
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("h AE 47 31 40 00 00 00 00 18 48 49 4C 4C 20 43 4C 49 4D 42 45", gg.TYPE_BYTE)
-    local r = gg.getResults(1); if #r==0 then return end
-    local base = r[1].address; gg.clearResults()
-    gg.searchNumber(base-0x18, gg.TYPE_QWORD)
-    local ptrs = gg.getResults(gg.getResultsCount()); local lp
-    for _, p in ipairs(ptrs) do if (p.address%0x100)==0 then lp=p.address; break end end
-    if not lp then return end
-    local codes, off = {}, 0
-    while off < 0x1000 do
-        local c = gg.getValues({{address=lp+off,flags=gg.TYPE_QWORD}})[1].value
-        if not c or c==0 then break end
-        codes[#codes+1] = c; off = off+8
-    end
-    local zp = yj.Allzeropages(); if not zp then return end
-    local ww, idx = {}, 0
-    for _, c in ipairs(codes) do
-        for k=0,5 do
-            idx = idx+1
-            ww[idx] = {address=zp+(idx-1)*4,flags=gg.TYPE_DWORD,value=gg.getValues({{address=c+k*4,flags=gg.TYPE_DWORD}})[1].value}
-        end
-    end
-    gg.setValues(ww); local n = #codes
-    gg.setValues({{address=ids[1]+0x48,flags=gg.TYPE_QWORD,value=zp},
-                  {address=ids[1]+0x50,flags=gg.TYPE_QWORD,value=zp+n*24},
-                  {address=ids[1]+0x58,flags=gg.TYPE_QWORD,value=zp+n*24},
-                  {address=ids[1]+0x2C,flags=gg.TYPE_DWORD,value=19}})
-    gg.toast("✅ "..n.." vehicles unlocked → item #1")
-end
-
-local function ADZ_GetResourcePool()
-    gg.clearResults(); gg.setRanges(RANGE_VALUE)
-    gg.searchNumber("h 0A 73 74 61 72 73 00 00", gg.TYPE_BYTE)
-    gg.refineNumber("h 0A", gg.TYPE_BYTE)
-    local stars = gg.getResults(gg.getResultsCount())
-    local starsAdd
-    for _, v in ipairs(stars) do
-        local chk = gg.getValues({{address=v.address+0x18,flags=gg.TYPE_DWORD}})[1].value
-        if chk == 1096045322 then starsAdd = v.address; break end
-    end
-    gg.clearResults()
-    if not starsAdd then return nil end
-    gg.searchNumber(starsAdd, gg.TYPE_DWORD)
-    local ptrs = gg.getResults(gg.getResultsCount())
-    local poolPtr
-    for _, p in ipairs(ptrs) do
-        local p1 = gg.getValues({{address=p.address+0x8,flags=gg.TYPE_QWORD}})[1].value
-        if p1 ~= 0 then
-            local hdr = gg.getValues({{address=p1,flags=gg.TYPE_DWORD}})[1].value
-            if hdr == 1919120138 then poolPtr = p.address; break end
-        end
-    end
-    if not poolPtr then return nil end
-    local out = {}
-    local off = 0
-    while off < 0x1000 do
-        local code = gg.getValues({{address=poolPtr+off,flags=gg.TYPE_QWORD}})[1].value
-        if not code or code == 0 then break end
-        local name = yj.getString(code + 0x19)
-        if name == "" then
-            local backup = gg.getValues({{address=code+0x28,flags=gg.TYPE_QWORD}})[1].value
-            if backup ~= 0 then name = yj.getString(backup) end
-        end
-        if name == "" then break end
-        out[#out+1] = {name=name, address=code}
-        off = off + 8
-    end
-    gg.clearResults()
-    return out
-end
-
-function ADZ_ReplaceEventReward()
-    _evShop = _evShop or ADZ_FindEventShop()
-    if not _evShop then
-        gg.alert("❌ Chưa có Event Shop!\nVào tab Event trước.")
-        return
-    end
-    _resourcePool = _resourcePool or ADZ_GetResourcePool()
-    if not _resourcePool or #_resourcePool == 0 then
-        gg.alert("❌ Không tìm được resource pool!\nVào Event Shop rồi thử lại.")
-        return
-    end
-    local ids = ADZ_FreeEventItems(_evShop.address)
-    if #ids == 0 then
-        gg.alert("❌ Không có item trong shop!")
-        return
-    end
-    local resLabels = {}
-    for i, r in ipairs(_resourcePool) do resLabels[i] = r.name end
-    resLabels[#resLabels+1] = "⬅️ Quay lại"
-    local rc = gg.choice(resLabels, nil, "🎁 Chọn loại resource để thay vào reward")
-    if not rc or rc == #resLabels then return end
-    local resource = _resourcePool[rc]
-    local itemLabels = {}
-    for i = 1, #ids do itemLabels[i] = "Item #" .. i end
-    itemLabels[#itemLabels+1] = "🌟 TẤT CẢ ITEMS"
-    itemLabels[#itemLabels+1] = "⬅️ Quay lại"
-    local ic = gg.choice(itemLabels, nil, "🎯 Chọn item cần thay reward\n→ " .. resource.name)
-    if not ic or ic == #itemLabels then return end
-    local amt = gg.prompt({"Số lượng reward:"}, {tostring(_rewardAmount)}, {"number"})
-    if not amt then return end
-    _rewardAmount = tonumber(amt[1]) or 100
-    local baseZp = yj.Allzeropages()
-    if not baseZp then
-        gg.alert("❌ Không tìm được zero page!")
-        return
-    end
-    local resData = {}
-    for j = 0, 5 do
-        resData[j] = gg.getValues({{address=resource.address + j*4, flags=gg.TYPE_DWORD}})[1].value
-    end
-    local targets = {}
-    if ic == #itemLabels - 1 then
-        for i = 1, #ids do
-            if ids[i] and ids[i] ~= 0 then targets[#targets+1] = ids[i] end
-        end
-    else
-        if ids[ic] and ids[ic] ~= 0 then targets[1] = ids[ic] end
-    end
-    local writes = {}
-    for idx, itemPtr in ipairs(targets) do
-        local zp = baseZp + (idx - 1) * 0x20
-        writes[#writes+1] = {address=zp+0x18, flags=gg.TYPE_DWORD, value=_rewardAmount}
-        for j = 0, 5 do
-            writes[#writes+1] = {address=zp+j*4, flags=gg.TYPE_DWORD, value=resData[j]}
-        end
-        writes[#writes+1] = {address=itemPtr+0x120, flags=gg.TYPE_QWORD, value=zp}
-        writes[#writes+1] = {address=itemPtr+0x128, flags=gg.TYPE_QWORD, value=zp+0x20}
-        writes[#writes+1] = {address=itemPtr+0x130, flags=gg.TYPE_QWORD, value=zp+0x20}
-    end
-    if #writes > 0 then gg.setValues(writes) end
-    gg.alert(string.format(
-        "✅ Đã thay reward cho %d item\n→ %s x%d\n\n💡 Thoát Event Shop rồi vào lại để thấy.",
-        #targets, resource.name, _rewardAmount))
-end
-
 function ADZ_EventsShopMenu()
     _evShop = _evShop or ADZ_FindEventShop()
     if not _evShop then
@@ -2469,18 +2085,10 @@ function ADZ_EventsShopMenu()
     local items = {
         "🛒 Bật Free Event Shop Items",
         "🗑️ Xoá toàn bộ event items",
-        "🎭 Inject All Character Skins  → item #2",
-        "🎬 Inject All Character Anims  → item #3",
-        "🚗 Inject All Vehicle Skins    → item #4",
-        "🛞 Inject All Tire Skins       → item #5",
-        "🔩 Get Parts xN                → item #1",
-        "🚙 Unlock All Vehicles + Max   → item #1",
-        "🎁 Thay Reward Event (Type+Amount)  ⭐ MỚI",
-        "🔄 Reload shop data",
         "⬅️ Quay lại"
     }
     local c = gg.choice(items, nil, "🎉 EVENT SHOP: ".._evShop.name)
-    if not c or c == #items then return MainMenu() end
+    if not c or c == 3 then return MainMenu() end
     if c==1 then ADZ_FreeEventItems(_evShop.address); gg.alert("✅ Đã bật!")
     elseif c==2 then
         local ids = ADZ_FreeEventItems(_evShop.address)
@@ -2492,18 +2100,272 @@ function ADZ_EventsShopMenu()
         end
         if #w>0 then gg.setValues(w) end
         gg.toast("✅ Đã xoá event items")
-    elseif c==3 then ADZ_InjectCharSkin(_evShop.address, 2)
-    elseif c==4 then ADZ_InjectAnim(_evShop.address, 3)
-    elseif c==5 then ADZ_InjectVehSkin(_evShop.address, 4)
-    elseif c==6 then ADZ_InjectTireSkin(_evShop.address, 5)
-    elseif c==7 then
-        local x = gg.prompt({"Số parts:"},{"300"},{"number"})
-        if x then ADZ_EventGetParts(_evShop.address, tonumber(x[1])) end
-    elseif c==8 then ADZ_EventUnlockAllVehicles(_evShop.address)
-    elseif c==9 then ADZ_ReplaceEventReward()
-    elseif c==10 then _evShop = nil; _resourcePool = nil; gg.toast("🔄 Reload")
     end
     ADZ_EventsShopMenu()
+end
+
+-- ═══════════════════════════════════════════════════════════════
+--   EXTRAS 
+-- ═══════════════════════════════════════════════════════════════
+-- [1] Free Garage Decorations
+local savedGarageDeco = {}
+local function freeGarageDeco()
+    local c = gg.choice({"🟢 Bật Free Garage Decorations","🔴 Tắt Free Garage Decorations","⬅️ Quay lại"},
+        nil, "🏠 Mở toàn bộ đồ trang trí garage\nTrạng thái: " .. (#savedGarageDeco > 0 and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return end
+    if c == 1 then
+        if not BaseRegion then gg.alert("❌ Chưa scan GameStatus!\n💡 Vào Garage trước."); return end
+        savedGarageDeco = {}
+        local edits = {}
+        gg.clearResults(); gg.setRanges(BaseRegion)
+        gg.searchNumber('h 1E 73 74 6F 63 6B 5F 6E 65 6F 6E 5F 73 69 67 6E', gg.TYPE_BYTE)
+        local rs1 = gg.getResults(gg.getResultsCount())
+        local anchor1 = nil
+        for _, v in ipairs(rs1) do
+            local v1 = gg.getValues({{address = v.address + 0x18, flags = gg.TYPE_DWORD}})[1]
+            local v2 = gg.getValues({{address = v.address + 0x48, flags = gg.TYPE_DWORD}})[1]
+            if v1 and v2 and v1.value == 1935755034 and v2.value == 1836009500 then
+                anchor1 = v.address; break
+            end
+        end
+        if anchor1 then
+            gg.clearResults(); gg.searchNumber(tostring(anchor1), gg.TYPE_QWORD)
+            local rs2 = gg.getResults(1)
+            if #rs2 > 0 then
+                local baseAddr = rs2[1].address
+                local offs = {0xB8, 0xBC, 0xC0, 0xC4, 0xC8, 0xCC, 0xD0, 0xD4}
+                local vals = {1, 1, 0, 1, 1, 0, 1, 0}
+                local offset = 0
+                for _ = 1, 1000 do
+                    local pr = gg.getValues({{address = baseAddr + offset, flags = gg.TYPE_QWORD}})[1]
+                    if not pr or pr.value == 0 then break end
+                    local deco = pr.value
+                    local chk = gg.getValues({{address = deco, flags = gg.TYPE_DWORD}})[1]
+                    if not chk or chk.value == 0 then break end
+                    for j = 1, 8 do
+                        local a = deco + offs[j]
+                        local cur = gg.getValues({{address = a, flags = gg.TYPE_DWORD}})[1]
+                        if cur then
+                            savedGarageDeco[#savedGarageDeco+1] = {address = a, flags = gg.TYPE_DWORD, value = cur.value}
+                            edits[#edits+1] = {address = a, flags = gg.TYPE_DWORD, value = vals[j]}
+                        end
+                    end
+                    offset = offset + 0x8
+                end
+            end
+        end
+        gg.clearResults(); gg.searchNumber('h 18 73 74 6F 63 6B 5F 72 61 66 74 65', gg.TYPE_BYTE)
+        local rs3 = gg.getResults(gg.getResultsCount())
+        local anchor2 = nil
+        for _, v in ipairs(rs3) do
+            local v1 = gg.getValues({{address = v.address + 0x18, flags = gg.TYPE_DWORD}})[1]
+            local v2 = gg.getValues({{address = v.address + 0x48, flags = gg.TYPE_DWORD}})[1]
+            if v1 and v2 and v1.value == 1952795930 and v2.value == 1836009500 then
+                anchor2 = v.address; break
+            end
+        end
+        if anchor2 then
+            gg.clearResults(); gg.searchNumber(tostring(anchor2), gg.TYPE_QWORD)
+            local rs4 = gg.getResults(1)
+            if #rs4 > 0 then
+                local ptr = rs4[1].address
+                local offs = {0xC8, 0xCC, 0xD0, 0xD4}
+                local vals = {1, 0, 1, 0}
+                local off2 = 0
+                for _ = 1, 1000 do
+                    local jr = gg.getValues({{address = ptr + off2, flags = gg.TYPE_QWORD}})[1]
+                    if not jr or jr.value == 0 then break end
+                    local deco = jr.value
+                    local chk = gg.getValues({{address = deco, flags = gg.TYPE_DWORD}})[1]
+                    if not chk or chk.value == 0 then break end
+                    for j = 1, 4 do
+                        local a = deco + offs[j]
+                        local cur = gg.getValues({{address = a, flags = gg.TYPE_DWORD}})[1]
+                        if cur then
+                            savedGarageDeco[#savedGarageDeco+1] = {address = a, flags = gg.TYPE_DWORD, value = cur.value}
+                            edits[#edits+1] = {address = a, flags = gg.TYPE_DWORD, value = vals[j]}
+                        end
+                    end
+                    off2 = off2 + 0x8
+                end
+            end
+        end
+        gg.clearResults(); gg.setRanges(RANGE_VALUE)
+        if #edits > 0 then
+            gg.setValues(edits)
+            gg.alert("✅ Đã mở " .. #edits .. " decorations!\n\n💡 Thoát garage rồi vào lại.")
+        else
+            gg.alert("❌ Không tìm thấy decorations!\n💡 Vào Garage trước.")
+        end
+    elseif c == 2 then
+        if #savedGarageDeco == 0 then gg.alert("❌ Chưa bật!"); return end
+        gg.setValues(savedGarageDeco); savedGarageDeco = {}
+        gg.alert("❌ Đã tắt Free Garage Decorations")
+    end
+end
+
+-- [2] Adventure Shop Hack
+local savedAdvShop = {}
+local function adventureShopHack()
+    local c = gg.choice({"🟢 Bật Adventure Shop Hack","🔴 Tắt Adventure Shop Hack","⬅️ Quay lại"},
+        nil, "🛒 Set giá Adventure Shop = 0\nTrạng thái: " .. (#savedAdvShop > 0 and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return end
+    if c == 1 then
+        savedAdvShop = {}
+        gg.clearResults()
+        gg.setRanges(gg.REGION_C_ALLOC | gg.REGION_C_DATA)
+        gg.searchNumber("8;80;20;50;25;50;20;200;100;60;600;20;200;50;100;1000;200;500;1000;2000::65000", gg.TYPE_DWORD)
+        local rs = gg.getResults(gg.getResultsCount())
+        gg.clearResults(); gg.setRanges(RANGE_VALUE)
+        if #rs == 0 then gg.alert("❌ Không tìm thấy pattern!\n💡 Vào Adventure Shop trước."); return end
+        for _, v in ipairs(rs) do
+            savedAdvShop[#savedAdvShop+1] = {address = v.address, flags = gg.TYPE_DWORD, value = v.value}
+        end
+        local edits = {}
+        for _, v in ipairs(rs) do edits[#edits+1] = {address = v.address, flags = gg.TYPE_DWORD, value = 0} end
+        gg.setValues(edits)
+        gg.alert("✅ Đã hack " .. #edits .. " mục!")
+    elseif c == 2 then
+        if #savedAdvShop == 0 then gg.alert("❌ Chưa bật!"); return end
+        gg.setValues(savedAdvShop); savedAdvShop = {}
+        gg.alert("❌ Đã restore")
+    end
+end
+
+-- [3] Speed Move Flying
+local savedSpeedMove = {}
+local function speedMoveFlying()
+    local c = gg.choice({"🟢 Bật Speed Move Flying","🔴 Tắt Speed Move Flying","⬅️ Quay lại"},
+        nil, "🚀 Chỉnh tốc độ bay\nTrạng thái: " .. (#savedSpeedMove > 0 and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return end
+    if c == 1 then
+        savedSpeedMove = {}
+        gg.clearResults(); gg.setRanges(gg.REGION_C_BSS)
+        gg.searchNumber("1.21701295e-11", gg.TYPE_FLOAT)
+        local rs = gg.getResults(1000)
+        gg.clearResults(); gg.setRanges(RANGE_VALUE)
+        if #rs == 0 then gg.alert("❌ Không tìm thấy!"); return end
+        for _, v in ipairs(rs) do
+            savedSpeedMove[#savedSpeedMove+1] = {address = v.address, flags = gg.TYPE_FLOAT, value = v.value}
+        end
+        local edits = {}
+        for _, v in ipairs(rs) do edits[#edits+1] = {address = v.address, flags = gg.TYPE_FLOAT, value = 9.32067437e-21} end
+        gg.setValues(edits)
+        gg.alert("✅ Đã bật (" .. #edits .. " patch)")
+    elseif c == 2 then
+        if #savedSpeedMove == 0 then gg.alert("❌ Chưa bật!"); return end
+        gg.setValues(savedSpeedMove); savedSpeedMove = {}
+        gg.alert("❌ Đã tắt")
+    end
+end
+
+-- [4] Unlimited Tasks
+local savedUnlimitedTasks = {}
+local function unlimitedTasks()
+    if not checkGameStatus() then return end
+    local c = gg.choice({"🟢 Bật Unlimited Tasks","🔴 Tắt Unlimited Tasks","⬅️ Quay lại"},
+        nil, "📋 Task không bao giờ hoàn thành\nTrạng thái: " .. (#savedUnlimitedTasks > 0 and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return end
+    if c == 1 then
+        if #savedUnlimitedTasks > 0 then gg.toast("✅ Đã bật rồi!"); return end
+        local ptr1 = gg.getValues({{address = BaseGameStatus + 0x6F8, flags = gg.TYPE_QWORD}})[1].value
+        local totalTasks = gg.getValues({{address = BaseGameStatus + 0x700, flags = gg.TYPE_DWORD}})[1].value
+        if not ptr1 or ptr1 == 0 or not totalTasks or totalTasks == 0 then
+            gg.alert("❌ Không đọc được task list!\n💡 Vào tab Tasks trước."); return
+        end
+        savedUnlimitedTasks = {}
+        for i = 0, totalTasks - 1 do
+            local p2r = gg.getValues({{address = ptr1 + i * 8, flags = gg.TYPE_QWORD}})[1]
+            if p2r and p2r.value ~= 0 then
+                local p2 = p2r.value
+                local o1C = gg.getValues({{address = p2 + 0x1C, flags = gg.TYPE_DWORD}})[1].value
+                local o20 = gg.getValues({{address = p2 + 0x20, flags = gg.TYPE_DWORD}})[1].value
+                local o24 = gg.getValues({{address = p2 + 0x24, flags = gg.TYPE_DWORD}})[1].value
+                if o1C and o1C > 0 then
+                    savedUnlimitedTasks[#savedUnlimitedTasks+1] = {
+                        a1C = p2 + 0x1C, o1C = o1C,
+                        a20 = p2 + 0x20, o20 = o20,
+                        a24 = p2 + 0x24, o24 = o24
+                    }
+                end
+            end
+        end
+        if #savedUnlimitedTasks == 0 then gg.alert("❌ Không có task nào active!"); return end
+        local freezeItems = {}
+        for _, t in ipairs(savedUnlimitedTasks) do
+            freezeItems[#freezeItems+1] = {address = t.a1C, flags = gg.TYPE_DWORD, value = t.o1C, freeze = true}
+            freezeItems[#freezeItems+1] = {address = t.a20, flags = gg.TYPE_DWORD, value = t.o1C, freeze = true}
+            freezeItems[#freezeItems+1] = {address = t.a24, flags = gg.TYPE_DWORD, value = 0,      freeze = true}
+        end
+        gg.addListItems(freezeItems)
+        gg.alert("✅ Đã freeze " .. #savedUnlimitedTasks .. " tasks!")
+    elseif c == 2 then
+        if #savedUnlimitedTasks == 0 then gg.alert("❌ Chưa bật!"); return end
+        local unfreeze = {}
+        for _, t in ipairs(savedUnlimitedTasks) do
+            unfreeze[#unfreeze+1] = {address = t.a1C, flags = gg.TYPE_DWORD, value = t.o1C, freeze = false}
+            unfreeze[#unfreeze+1] = {address = t.a20, flags = gg.TYPE_DWORD, value = t.o20, freeze = false}
+            unfreeze[#unfreeze+1] = {address = t.a24, flags = gg.TYPE_DWORD, value = t.o24, freeze = false}
+        end
+        gg.removeListItems(unfreeze)
+        gg.setValues(unfreeze)
+        savedUnlimitedTasks = {}
+        gg.alert("❌ Đã restore tasks")
+    end
+end
+
+-- [5] +498 Rank Points
+local savedRankPoints = {}
+local function rankPointsBoost()
+    local c = gg.choice({"🟢 Bật +498 Rank Points","🔴 Tắt +498 Rank Points","⬅️ Quay lại"},
+        nil, "🏆 Boost điểm rank (+498)\nTrạng thái: " .. (#savedRankPoints > 0 and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return end
+    if c == 1 then
+        if not BaseRegion then gg.alert("❌ Chưa scan GameStatus!"); return end
+        savedRankPoints = {}
+        gg.clearResults(); gg.setRanges(BaseRegion)
+        gg.searchNumber("h 1C 4C 65 61 67 75 65 54", gg.TYPE_BYTE)
+        gg.refineNumber("h 1C", gg.TYPE_BYTE)
+        local rs = gg.getResults(gg.getResultsCount())
+        gg.clearResults(); gg.setRanges(RANGE_VALUE)
+        if #rs == 0 then gg.alert("❌ Không tìm thấy!\n💡 Chạy 1 trận rank trước."); return end
+        local edits = {}
+        for _, res in ipairs(rs) do
+            local chk = gg.getValues({{address = res.address + 0x1C, flags = gg.TYPE_FLOAT}})[1]
+            if chk and math.abs(chk.value - 0.2) < 0.001 then
+                savedRankPoints[#savedRankPoints+1] = {address = res.address + 0x1C, flags = gg.TYPE_FLOAT, value = chk.value}
+                edits[#edits+1] = {address = res.address + 0x1C, flags = gg.TYPE_FLOAT, value = 0.498}
+            end
+        end
+        if #edits == 0 then gg.alert("❌ Không match giá trị 0.2!"); return end
+        gg.setValues(edits)
+        gg.alert("✅ Đã patch " .. #edits .. " điểm rank!")
+    elseif c == 2 then
+        if #savedRankPoints == 0 then gg.alert("❌ Chưa bật!"); return end
+        gg.setValues(savedRankPoints); savedRankPoints = {}
+        gg.alert("❌ Đã restore")
+    end
+end
+
+-- [6] Fake Rank
+local origFakeRank = nil
+local function fakeRank()
+    if not checkGameStatus() then return end
+    local c = gg.choice({"🟢 Bật Fake Rank (50)","🔴 Tắt Fake Rank","⬅️ Quay lại"},
+        nil, "⭐ Set Legend rank = 50.0\nTrạng thái: " .. (origFakeRank and "🟢 ON" or "🔴 OFF"))
+    if not c or c == 3 then return end
+    if c == 1 then
+        if origFakeRank then gg.toast("✅ Đã bật!"); return end
+        local cur = gg.getValues({{address = BaseGameStatus + 0x200, flags = gg.TYPE_FLOAT}})[1]
+        origFakeRank = cur and cur.value or 0
+        gg.setValues({{address = BaseGameStatus + 0x200, flags = gg.TYPE_FLOAT, value = 50.0}})
+        gg.alert("✅ Fake Rank = 50")
+    elseif c == 2 then
+        if not origFakeRank then gg.alert("❌ Chưa bật!"); return end
+        gg.setValues({{address = BaseGameStatus + 0x200, flags = gg.TYPE_FLOAT, value = origFakeRank}})
+        origFakeRank = nil
+        gg.alert("❌ Đã restore rank")
+    end
 end
 
 -- ═══════════════════════════════════════════════════════════════
@@ -2512,10 +2374,10 @@ end
 local function About()
     local info = [[
 ╔══════════════════════════════════╗
-║      ꧁AɴнDᴇᴘZᴀı꧂ SCRIPT V3.4      ║
+║   AɴнDᴇᴘZᴀı SCRIPT V3.4      ║
 ╚══════════════════════════════════╝
 
-📌 Version: V3.4 (anhdepzai + Eomthix merge)
+📌 Version: V3.4
 🎮 Game: Hill Climb Racing 2
 ⚙️ GG: 101.1
 
@@ -2524,131 +2386,189 @@ local function About()
    ✈️ Telegram :: t.me/anhdepzai360
    📺 Youtube  :: @Andepzai
 
-⚡ FEATURES (35):
-   ✅ Auto Win (ARMV8)
-   ✅ Fake Unlock
-   ✅ Free Upgrade
-   ✅ Force Boss         
-   ✅ Force Cup              
-   ✅ Upgrade Parts Without Scrap
-   ✅ Fly Hack
-   ✅ Unlock Any Vehicle 
-   ✅ Tracks Editor
-   ✅ Vehicle Hacks 
-   ✅ Free Chests
-   ✅ Free Purchases
-   ✅ Parts Drop (Legendary)
-   ✅ Adventure Chest Hack V1
-   ✅ Flat Ground for Adventure
-   ✅ Debug Mode
-   ✅ VIP Pass (Real)
-   ✅ Diamonds (SR) + Bypass
-   ✅ Max Vehicles
-   ✅ Max Mastery
-   ✅ Max Parts
-   ✅ Set Fuel & Coins
-   ✅ Mastery & Cups
-   ✅ Team Event Menu
-   ✅ Event Menu
-   ✅ Game Data Browser
-   ✅ Vehicle Speed
-   ✅ Global Vision
-   ✅ Terrain Flat Advanced
-   ✅ Player Data 
-   ✅ Super Parts Custom
-   ✅ Events Shop
-   ✅ Fake VIP      
-   ✅ About
-   ✅ Exit
+⚡ 10 TABS:
+   1. LIB PATCH (5)
+   2. TIỀN & RESOURCES (6)
+   3. NÂNG CẤP XE (8)
+   4. HACK XE (2)
+   5. VẬT LÝ & MAP (5)
+   6. EVENTS (4)
+   7. PLAYER & COSMETICS (3)
+   8. CUPS & RANKING (4)
+   9. TOOLS (3)
 
-⚠️ Tôi không chịu trách nhiệm
+⚠️ Không chịu trách nhiệm
 ]]
     gg.alert(info, "OK")
     return MainMenu()
 end
 
 -- ═══════════════════════════════════════════════════════════════
---  MAIN MENU V3.4 (35 items)
+--  TABS
+-- ═══════════════════════════════════════════════════════════════
+function TabLibPatch()
+    local items = {
+        "🔥 Auto Win (ARMV8)","🎭 Fake Unlock","🔧 Free Upgrade",
+        "👹 Force Boss","🎭 Fake VIP","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🔥 TAB: LIB PATCH")
+    if not c or c == 6 then return MainMenu() end
+    if     c == 1 then autoWin()
+    elseif c == 2 then fakeUnlock()
+    elseif c == 3 then freeUpgrade()
+    elseif c == 4 then forceBoss()
+    elseif c == 5 then FakeVIPMenu()
+    end
+    return TabLibPatch()
+end
+function TabMoney()
+    local items = {
+        "💎 Diamonds (SR) + Bypass","⚡ Free Chests","💳 Free Purchases",
+        "💰 Set Fuel & Coins","⭐ VIP Pass (Real)","🛒 Adventure Shop Hack","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "💰 TAB: TIỀN & RESOURCES")
+    if not c or c == 7 then return MainMenu() end
+    if     c == 1 then diamondsSR()
+    elseif c == 2 then freeChests()
+    elseif c == 3 then freePurchases()
+    elseif c == 4 then SetFuelCoins()
+    elseif c == 5 then vipPassFunc()
+    elseif c == 6 then adventureShopHack()
+    end
+    return TabMoney()
+end
+function TabUpgrade()
+    local items = {
+        "🚀 Max Vehicles","⭐ Max Mastery","🔩 Max Parts",
+        "🧩 Parts Slots Editor","⚡ Upgrade Without Scrap",
+        "🚗 Unlock Any Vehicle","🔧 Parts Drop (Legendary)",
+        "🔩 Super Parts Custom","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🚗 TAB: NÂNG CẤP XE")
+    if not c or c == 9 then return MainMenu() end
+    if     c == 1 then MaxVehicles()
+    elseif c == 2 then MaxMastery()
+    elseif c == 3 then MaxParts()
+    elseif c == 4 then PartsSlotsMenu()
+    elseif c == 5 then upgradeWithoutScrap()
+    elseif c == 6 then unlockAnyVehicle()
+    elseif c == 7 then partsDropLegendary()
+    elseif c == 8 then ADZ_SuperPartsMenu()
+    end
+    return TabUpgrade()
+end
+function TabVehicleHacks()
+    local items = {"🏎️ Vehicle Hacks (5 xe)","🚗 Vehicle Speed","⬅️ Quay lại"}
+    local c = gg.choice(items, nil, "🏎️ TAB: HACK XE")
+    if not c or c == 3 then return MainMenu() end
+    if     c == 1 then vehicleHacksMenu()
+    elseif c == 2 then VehicleSpeedMenu()
+    end
+    return TabVehicleHacks()
+end
+function TabPhysics()
+    local items = {
+        "🚀 Fly Hack","🚀 Speed Move Flying","👁️ Global Vision",
+        "➖ Terrain Flat Advanced (15 maps)","➖ Flat Ground for Adventure","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🚀 TAB: VẬT LÝ & MAP")
+    if not c or c == 6 then return MainMenu() end
+    if     c == 1 then flyHack()
+    elseif c == 2 then speedMoveFlying()
+    elseif c == 3 then GlobalVisionMenu()
+    elseif c == 4 then TerrainFlatMenu()
+    elseif c == 5 then flatGroundAdventure()
+    end
+    return TabPhysics()
+end
+function TabEvents()
+    local items = {
+        "🎯 Team Event Menu","🎉 Event Menu","🎉 Events Shop",
+        "🧰 Adventure Chest Hack V1","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🎉 TAB: EVENTS")
+    if not c or c == 5 then return MainMenu() end
+    if     c == 1 then TeamEventMenu()
+    elseif c == 2 then EventMenu()
+    elseif c == 3 then ADZ_EventsShopMenu()
+    elseif c == 4 then advChestHackV1()
+    end
+    return TabEvents()
+end
+function TabPlayer()
+    local items = {
+        "👤 Player Data (39 fields)","🕹️ Mastery & Cups",
+        "🏠 Free Garage Decorations","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "👤 TAB: PLAYER & COSMETICS")
+    if not c or c == 4 then return MainMenu() end
+    if     c == 1 then ADZ_PlayerMenu()
+    elseif c == 2 then MasteryCupsMenu()
+    elseif c == 3 then freeGarageDeco()
+    end
+    return TabPlayer()
+end
+function TabCups()
+    local items = {
+        "🏁 Force Cup","🏆 +498 Rank Points","⭐ Fake Rank",
+        "📋 Unlimited Tasks","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🏆 TAB: CUPS & RANKING")
+    if not c or c == 5 then return MainMenu() end
+    if     c == 1 then forceCup()
+    elseif c == 2 then rankPointsBoost()
+    elseif c == 3 then fakeRank()
+    elseif c == 4 then unlimitedTasks()
+    end
+    return TabCups()
+end
+function TabTools()
+    local items = {
+        "🛣️ Tracks Editor","💎 Debug Mode","📚 Game Data Browser","⬅️ Quay lại"
+    }
+    local c = gg.choice(items, nil, "🛠️ TAB: TOOLS")
+    if not c or c == 4 then return MainMenu() end
+    if     c == 1 then tracksEditor()
+    elseif c == 2 then debugMode()
+    elseif c == 3 then GameDataMenu()
+    end
+    return TabTools()
+end
+
+-- ═══════════════════════════════════════════════════════════════
+--  MAIN MENU
 -- ═══════════════════════════════════════════════════════════════
 function MainMenu()
     gg.setVisible(false)
-    local menu = {
-        "🔥 Auto Win (ARMV8)",
-        "🎭 Fake Unlock",
-        "🔧 Free Upgrade",
-        "👹 Force Boss (1.75.0)",          
-        "🏁 Force Cup (Experimental)",      
-        "⚡ Upgrade Parts Without Scrap",
-        "🚀 Fly Hack",
-        "🚗 Unlock Any Vehicle",            
-        "🛣️ Tracks Editor",
-        "🏎️ Vehicle Hacks",
-        "⚡ Free Chests",
-        "💳 Free Purchases",
-        "🔧 Parts Drop (Legendary)",
-        "🧰 Adventure Chest Hack V1",
-        "➖ Flat Ground for Adventure",
-        "💎 Debug Mode",
-        "⭐ VIP Pass (Real)",
-        "💎 Diamonds (SR) + Bypass",
-        "🚀 Max Vehicles",
-        "⭐ Max Mastery",
-        "🔩 Max Parts",
-        "💰 Set Fuel & Coins",
-        "🕹️ Mastery & Cups",
-        "🎯 Team Event Menu",
-        "🎉 Event Menu",
-        "📚 Game Data Browser",
-        "🚗 Vehicle Speed",
-        "👁️ Global Vision",
-        "➖ Terrain Flat Advanced",
-        "👤 Player Data (39)",
-        "🔩 Super Parts Custom",
-        "🎉 Events Shop",
-        "🎭 Fake VIP ",         
-        "ℹ️ About",
-        "❌ Exit"
+    local items = {
+        "🔥 LIB PATCH (5)",
+        "💰 TIỀN & RESOURCES (6)",
+        "🚗 NÂNG CẤP XE (8)",
+        "🏎️ HACK XE (2)",
+        "🚀 VẬT LÝ & MAP (5)",
+        "🎉 EVENTS (4)",
+        "👤 PLAYER & COSMETICS (3)",
+        "🏆 CUPS & RANKING (4)",
+        "🛠️ TOOLS (3)",
+        "ℹ️ ABOUT",
+        "❌ EXIT"
     }
-    local choice = gg.choice(menu, nil, "AɴнDᴇᴘZᴀı V3.4")
-    if not choice then return end
-    if choice == 1 then autoWin()
-    elseif choice == 2 then fakeUnlock()
-    elseif choice == 3 then freeUpgrade()
-    elseif choice == 4 then forceBoss()          -- NEW
-    elseif choice == 5 then forceCup()           -- NEW
-    elseif choice == 6 then upgradeWithoutScrap()
-    elseif choice == 7 then flyHack()
-    elseif choice == 8 then unlockAnyVehicle()
-    elseif choice == 9 then tracksEditor()
-    elseif choice == 10 then vehicleHacksMenu()
-    elseif choice == 11 then freeChests()
-    elseif choice == 12 then freePurchases()
-    elseif choice == 13 then partsDropLegendary()
-    elseif choice == 14 then advChestHackV1()
-    elseif choice == 15 then flatGroundAdventure()
-    elseif choice == 16 then debugMode()
-    elseif choice == 17 then vipPassFunc()
-    elseif choice == 18 then diamondsSR()
-    elseif choice == 19 then MaxVehicles()
-    elseif choice == 20 then MaxMastery()
-    elseif choice == 21 then MaxParts()
-    elseif choice == 22 then SetFuelCoins()
-    elseif choice == 23 then MasteryCupsMenu()
-    elseif choice == 24 then TeamEventMenu()
-    elseif choice == 25 then EventMenu()
-    elseif choice == 26 then GameDataMenu()
-    elseif choice == 27 then VehicleSpeedMenu()
-    elseif choice == 28 then GlobalVisionMenu()
-    elseif choice == 29 then TerrainFlatMenu()
-    elseif choice == 30 then ADZ_PlayerMenu()
-    elseif choice == 31 then ADZ_SuperPartsMenu()
-    elseif choice == 32 then ADZ_EventsShopMenu()
-    elseif choice == 33 then FakeVIPMenu()
-    elseif choice == 34 then About()
-    elseif choice == 35 then
+    local c = gg.choice(items, nil, "AɴнDᴇᴘZᴀı V3.4 — TABS")
+    if not c or c == 11 then
         gg.setVisible(true)
         print(ShowPrint)
         os.exit()
+    end
+    if     c == 1 then TabLibPatch()
+    elseif c == 2 then TabMoney()
+    elseif c == 3 then TabUpgrade()
+    elseif c == 4 then TabVehicleHacks()
+    elseif c == 5 then TabPhysics()
+    elseif c == 6 then TabEvents()
+    elseif c == 7 then TabPlayer()
+    elseif c == 8 then TabCups()
+    elseif c == 9 then TabTools()
+    elseif c == 10 then About()
     end
 end
 
@@ -2661,24 +2581,19 @@ checkHCR2()
 getLib()
 archType = detectArch()
 gameVersion = getHCR2Version()
-
 if archType == 3 or archType == 4 then
-    gg.alert("⚠️ Phát hiện Emulator!\nAuto Win / Fake Unlock / Free Upgrade / Force Boss sẽ không hoạt động.")
+    gg.alert("⚠️ Phát hiện Emulator!\nLib patches sẽ không hoạt động.")
 end
-
 selectRange()
 gg.clearResults()
 gg.clearList()
 gg.setRanges(RANGE_VALUE)
-gg.toast("🚀 Starting AɴнDᴇᴘZᴀı V3.4...")
+gg.toast("🚀 Starting AɴнDᴇᴘZᴀı V3.5...")
 gg.sleep(800)
-
 if not findGameStatus() then
-    gg.toast("⚠️ Chưa tìm thấy GameStatus (vào Garage để fix)")
+    gg.toast("⚠️ Chưa tìm thấy GameStatus (❌)")
 end
-
 MainMenu()
-
 while true do
     if gg.isVisible(true) then
         gg.setVisible(false)
