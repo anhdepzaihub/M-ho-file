@@ -11,160 +11,44 @@
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
     background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 16px;
   }
   .card {
     background: #fff;
-    padding: 40px 32px;
+    padding: 36px 28px 28px;
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(0,0,0,.25);
     text-align: center;
-    width: 340px;
+    width: 360px;
   }
   h1 { font-size: 20px; color: #333; margin-bottom: 6px; }
-  p.sub { font-size: 13px; color: #888; margin-bottom: 24px; }
-  .code {
-    font-size: 44px;
-    font-weight: 700;
-    letter-spacing: 10px;
-    color: #4b3faf;
-    background: #f3f1ff;
-    padding: 14px 0 14px 10px;
-    border-radius: 12px;
-    user-select: all;
-    margin-bottom: 10px;
-  }
-  .timer {
-    font-size: 13px;
-    color: #e05a00;
-    height: 18px;
-    margin-bottom: 20px;
-  }
-  .timer.expired { color: #d32f2f; font-weight: 600; }
-  button {
-    width: 100%;
-    padding: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #fff;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: opacity .2s;
-  }
-  button:hover { opacity: .9; }
-  button.copy { background: #eee; color: #333; }
-  button:disabled { opacity: .5; cursor: not-allowed; }
-</style>
-</head>
-<body>
+  p.sub { font-size: 13px; color: #888; margin-bottom: 18px; }
 
-<div class="card">
-  <h1>🔐 Mã xác nhận</h1>
-  <p class="sub">Nhấn nút để tạo mã mới (hiệu lực 60 giây)</p>
-
-  <div class="code" id="code">------</div>
-  <div class="timer" id="timer"></div>
-
-  <button id="genBtn">Tạo mã mới</button>
-  <button class="copy" id="copyBtn">📋 Sao chép mã</button>
-</div>
-
-<script>
-let currentCode = "";
-let timeLeft = 0;
-let intervalId = null;
-
-const codeEl  = document.getElementById("code");
-const timerEl = document.getElementById("timer");
-const genBtn  = document.getElementById("genBtn");
-const copyBtn = document.getElementById("copyBtn");
-
-// Sinh mã OTP 6 chữ số bằng crypto (an toàn hơn Math.random)
-function generateCode(length = 6) {
-  const arr = new Uint32Array(length);
-  crypto.getRandomValues(arr);
-  return Array.from(arr, n => (n % 10).toString()).join("");
-}
-
-function startTimer(seconds) {
-  clearInterval(intervalId);
-  timeLeft = seconds;
-  updateTimer();
-  intervalId = setInterval(() => {
-    timeLeft--;
-    updateTimer();
-    if (timeLeft <= 0) {
-      clearInterval(intervalId);
-      currentCode = "";
-      codeEl.textContent = "------";
-      copyBtn.disabled = true;
-      timerEl.textContent = "❌ Mã đã hết hạn, vui lòng tạo mã mới";
-      timerEl.classList.add("expired");
-    }
-  }, 1000);
-}
-
-function updateTimer() {
-  timerEl.classList.remove("expired");
-  timerEl.textContent = `⏳ Hết hạn sau: ${timeLeft}s`;
-}
-
-function newCode() {
-  currentCode = generateCode(6);
-  codeEl.textContent = currentCode;
-  copyBtn.disabled = false;
-  startTimer(60);
-}
-
-genBtn.addEventListener("click", newCode);
-
-copyBtn.addEventListener("click", async () => {
-  if (!currentCode) return;
-  try {
-    await navigator.clipboard.writeText(currentCode);
-    copyBtn.textContent = "✅ Đã sao chép!";
-    setTimeout(() => copyBtn.textContent = "📋 Sao chép mã", 1500);
-  } catch {
-    alert("Mã của bạn: " + currentCode);
-  }
-});
-
-// Tạo mã sẵn khi mở trang
-newCode();
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mã xác nhận trực tuyến</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    min-height: 100vh;
+  /* Thanh trạng thái kết nối */
+  .status-bar {
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    gap: 8px;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    background: #f5f5f5;
+    color: #666;
+    transition: background .3s, color .3s;
   }
-  .card {
-    background: #fff;
-    padding: 40px 32px;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,.25);
-    text-align: center;
-    width: 340px;
+  .status-bar.online   { background: #e7f7ec; color: #1b7a3d; }
+  .status-bar.offline  { background: #fdeaea; color: #c62828; }
+  .status-bar.checking { background: #fff7e0; color: #b07a00; }
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: currentColor;
+    animation: pulse 1.2s infinite ease-in-out;
   }
-  h1 { font-size: 20px; color: #333; margin-bottom: 6px; }
-  p.sub { font-size: 13px; color: #888; margin-bottom: 24px; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
   .code {
-    font-size: 44px;
-    font-weight: 700;
-    letter-spacing: 10px;
-    color: #4b3faf;
+    font-size: 44px; font-weight: 700;
+    letter-spacing: 10px; color: #4b3faf;
     background: #f3f1ff;
     padding: 14px 0 14px 10px;
     border-radius: 12px;
@@ -172,27 +56,23 @@ newCode();
     margin-bottom: 10px;
   }
   .timer {
-    font-size: 13px;
-    color: #e05a00;
-    height: 18px;
-    margin-bottom: 20px;
+    font-size: 13px; color: #e05a00;
+    height: 18px; margin-bottom: 20px;
   }
   .timer.expired { color: #d32f2f; font-weight: 600; }
+
   button {
-    width: 100%;
-    padding: 12px;
-    font-size: 15px;
-    font-weight: 600;
+    width: 100%; padding: 12px;
+    font-size: 15px; font-weight: 600;
     color: #fff;
     background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-bottom: 10px;
+    border: none; border-radius: 10px;
+    cursor: pointer; margin-bottom: 10px;
     transition: opacity .2s;
   }
   button:hover { opacity: .9; }
   button.copy { background: #eee; color: #333; }
+  button.retry { background: #ff9800; }
   button:disabled { opacity: .5; cursor: not-allowed; }
 </style>
 </head>
@@ -202,30 +82,50 @@ newCode();
   <h1>🔐 Mã xác nhận</h1>
   <p class="sub">Nhấn nút để tạo mã mới (hiệu lực 60 giây)</p>
 
+  <!-- Trạng thái kết nối -->
+  <div class="status-bar checking" id="statusBar">
+    <span class="dot"></span>
+    <span id="statusText">Đang kiểm tra kết nối...</span>
+  </div>
+
   <div class="code" id="code">------</div>
   <div class="timer" id="timer"></div>
 
   <button id="genBtn">Tạo mã mới</button>
   <button class="copy" id="copyBtn">📋 Sao chép mã</button>
+  <button class="retry" id="retryBtn" style="display:none">🔄 Thử lại kết nối</button>
 </div>
 
 <script>
-let currentCode = "";
-let timeLeft = 0;
-let intervalId = null;
+/* ================= CẤU HÌNH ================= */
+// Đổi URL này thành endpoint thật của bạn, ví dụ: https://api.yoursite.com/ping
+const PING_URL = "https://www.google.com/generate_204";
+const PING_TIMEOUT = 4000;   // ms
+const RETRY_DELAY  = 3000;   // tự thử lại sau 3s khi offline
 
-const codeEl  = document.getElementById("code");
-const timerEl = document.getElementById("timer");
-const genBtn  = document.getElementById("genBtn");
-const copyBtn = document.getElementById("copyBtn");
+/* ================= PHẦN TỬ ================= */
+const codeEl     = document.getElementById("code");
+const timerEl    = document.getElementById("timer");
+const statusBar  = document.getElementById("statusBar");
+const statusText = document.getElementById("statusText");
+const genBtn     = document.getElementById("genBtn");
+const copyBtn    = document.getElementById("copyBtn");
+const retryBtn   = document.getElementById("retryBtn");
 
-// Sinh mã OTP 6 chữ số bằng crypto (an toàn hơn Math.random)
+let currentCode  = "";
+let timeLeft     = 0;
+let intervalId   = null;
+let isOnline     = false;
+let retryTimer   = null;
+
+/* ================= 1. SINH MÃ OTP ================= */
 function generateCode(length = 6) {
   const arr = new Uint32Array(length);
   crypto.getRandomValues(arr);
   return Array.from(arr, n => (n % 10).toString()).join("");
 }
 
+/* ================= 2. ĐẾM NGƯỢC ================= */
 function startTimer(seconds) {
   clearInterval(intervalId);
   timeLeft = seconds;
@@ -243,21 +143,101 @@ function startTimer(seconds) {
     }
   }, 1000);
 }
-
 function updateTimer() {
   timerEl.classList.remove("expired");
   timerEl.textContent = `⏳ Hết hạn sau: ${timeLeft}s`;
 }
 
-function newCode() {
+/* ================= 3. KIỂM TRA KẾT NỐI MẠNG ================= */
+function setStatus(state, message) {
+  statusBar.className = "status-bar " + state;
+  statusText.textContent = message;
+}
+
+// Kiểm tra bằng navigator.onLine + fetch thực tế
+async function checkConnection() {
+  if (!navigator.onLine) {
+    isOnline = false;
+    setStatus("offline", "Mất kết nối mạng (offline)");
+    showRetry(true);
+    scheduleRetry();
+    return false;
+  }
+
+  setStatus("checking", "Đang kiểm tra phản hồi từ server...");
+  showRetry(false);
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), PING_TIMEOUT);
+
+    // no-cors để ping được nhiều domain mà không bị CORS chặn
+    await fetch(PING_URL + "?t=" + Date.now(), {
+      method: "GET",
+      mode: "no-cors",
+      cache: "no-store",
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    isOnline = true;
+    setStatus("online", "✓ Đã kết nối server");
+    genBtn.disabled = false;
+    clearTimeout(retryTimer);
+    return true;
+
+  } catch (err) {
+    isOnline = false;
+    const msg = err.name === "AbortError"
+      ? "Server không phản hồi (timeout)"
+      : "Không kết nối được server";
+    setStatus("offline", "✗ " + msg);
+    showRetry(true);
+    genBtn.disabled = true;
+    scheduleRetry();
+    return false;
+  }
+}
+
+function showRetry(show) {
+  retryBtn.style.display = show ? "block" : "none";
+}
+
+function scheduleRetry() {
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(() => {
+    if (!isOnline) checkConnection();
+  }, RETRY_DELAY);
+}
+
+/* ================= 4. TẠO MÃ ================= */
+async function newCode() {
+  // Bắt buộc phải có kết nối trước khi tạo mã
+  const ok = await checkConnection();
+  if (!ok) {
+    alert("Không thể tạo mã: chưa kết nối được server.\nVui lòng kiểm tra mạng và thử lại.");
+    return;
+  }
+
   currentCode = generateCode(6);
   codeEl.textContent = currentCode;
   copyBtn.disabled = false;
   startTimer(60);
+
+  // Demo: giả lập gửi mã lên server → nếu bạn có API thật, thay bằng fetch()
+  // try {
+  //   const res = await fetch("https://api.yoursite.com/otp", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ code: currentCode })
+  //   });
+  //   if (!res.ok) throw new Error("Server trả lỗi " + res.status);
+  // } catch (e) {
+  //   alert("Gửi OTP thất bại: " + e.message);
+  // }
 }
 
-genBtn.addEventListener("click", newCode);
-
+/* ================= 5. SAO CHÉP ================= */
 copyBtn.addEventListener("click", async () => {
   if (!currentCode) return;
   try {
@@ -269,8 +249,28 @@ copyBtn.addEventListener("click", async () => {
   }
 });
 
-// Tạo mã sẵn khi mở trang
-newCode();
+/* ================= 6. SỰ KIỆN ================= */
+genBtn.addEventListener("click", newCode);
+retryBtn.addEventListener("click", () => checkConnection());
+
+// Lắng nghe thay đổi mạng từ hệ điều hành
+window.addEventListener("online",  () => { console.log("[NET] online"); checkConnection(); });
+window.addEventListener("offline", () => {
+  console.log("[NET] offline");
+  isOnline = false;
+  setStatus("offline", "Mất kết nối mạng (offline)");
+  genBtn.disabled = true;
+  showRetry(true);
+});
+
+// Kiểm tra định kỳ mỗi 30s để phát hiện server chết dù mạng vẫn OK
+setInterval(() => { if (!document.hidden) checkConnection(); }, 30000);
+
+/* ================= 7. KHỞI ĐỘNG ================= */
+(async () => {
+  await checkConnection();
+  if (isOnline) newCode(); // tự tạo mã nếu đã có mạng
+})();
 </script>
 
 </body>
