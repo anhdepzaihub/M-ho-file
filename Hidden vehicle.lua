@@ -16,7 +16,13 @@ if not gg.getTargetInfo().x64 then
 end
 
 -- Hiển thị thông tin
-gg.toast("Hidden Vehicle Replacement\nby: anhdepzai")
+gg.toast("Hidden Vehicle Replacement\nby: ANHDEPZAI 🇻🇳")
+print("========================================")
+print("ANHDEPZAI HUB - Hidden Vehicle Script Loaded")
+print("Author: anh2k9VN | ANHDEPZAI 🇻🇳")
+print("Target Arch: " .. arch)
+print("Game Version: " .. tostring(gg.getTargetInfo().versionName))
+print("========================================")
 
 -- ==================== CẤU HÌNH ====================
 local Config = {
@@ -57,8 +63,6 @@ end
 
 -- ==================== KIỂM TRA GARAGE ====================
 
--- Kiểm tra người dùng đã vào Garage chưa
--- (Garage có chuỗi "hill_climb_cup" hoặc "garage" trong bộ nhớ)
 function checkGarage()
     gg.clearResults()
     gg.setRanges(Config.baseRegion)
@@ -66,14 +70,15 @@ function checkGarage()
     
     if gg.getResultsCount() > 0 then
         gg.clearResults()
+        print("[CheckGarage] Phát hiện garage qua chuỗi bgm_garage")
         return true
     end
     
-    -- Thử tìm pattern khác
     gg.clearResults()
     gg.searchNumber("h 0E 53 43 4F 4F 54 45 52", 1)  -- "SCOOTER"
     local found = gg.getResultsCount() > 0
     gg.clearResults()
+    print("[CheckGarage] Trạng thái SCOOTER: " .. tostring(found))
     return found
 end
 
@@ -82,7 +87,6 @@ end
 function MainMenu()
     gg.clearResults()
     
-    -- Kiểm tra garage
     local inGarage = checkGarage()
     Config.garageReady = inGarage
     
@@ -90,20 +94,21 @@ function MainMenu()
         and L("✅ Đã phát hiện Garage", "✅ Garage detected")
         or L("⚠️ Chưa vào Garage - Hãy vào Garage trước!", "⚠️ Not in Garage - Please enter Garage first!")
     
+    -- Danh sách menu theo đúng thứ tự mảng (index từ 1 đến 8 tính cả dòng kẻ)
     local menuItems = {
-        L("1. Ván trượt tuyết (Skis) → Jeep", "1. Skis → Jeep"),
-        L("2. Xe trượt tuyết (Sled) → Jeep", "2. Sled → Jeep"),
-        L("3. Lốp tuyết (Snow Tires) → Jeep", "3. Snow Tires → Jeep"),
-        L("───────────────────────────", "───────────────────────────"),
-        L("4. 🔄 Khôi phục Jeep gốc", "4. 🔄 Restore Original Jeep"),
-        L("5. 🔍 Kiểm tra Garage", "5. 🔍 Check Garage"),
-        L("6. 🌐 Đổi ngôn ngữ (Việt/Anh)", "6. 🌐 Change Language"),
-        L("7. ❌ Thoát", "7. ❌ Exit")
+        L("1. Ván trượt tuyết (Skis) → Jeep", "1. Skis → Jeep"),          -- [1]
+        L("2. Xe trượt tuyết (Sled) → Jeep", "2. Sled → Jeep"),          -- [2]
+        L("3. Lốp tuyết (Snow Tires) → Jeep", "3. Snow Tires → Jeep"),    -- [3]
+        L("───────────────────────────", "───────────────────────────"), -- [4] (Dòng kẻ ngang)
+        L("4. 🔄 Khôi phục Jeep gốc", "4. 🔄 Restore Original Jeep"),    -- [5]
+        L("5. 🔍 Kiểm tra Garage", "5. 🔍 Check Garage"),                -- [6]
+        L("6. 🌐 Đổi ngôn ngữ (Tiếng Việt/English)", "6. 🌐 Change Language (VI/EN)"), -- [7]
+        L("7. ❌ Thoát", "7. ❌ Exit")                                   -- [8]
     }
     
     local title = L(
-        "╔══════════════════════════╗\n║  THAY THẾ XE ẨN + by: ANHDEPZAI          ║\n╚══════════════════════════╝\n" .. status,
-        "╔══════════════════════════╗\n║  HIDDEN VEHICLE REPLACE  ║\n╚══════════════════════════╝\n" .. status
+        "╔══════════════════════════╗\n║  THAY THẾ XE ẨN + by: ANHDEPZAI 🇻🇳     ║\n╚══════════════════════════╝\n" .. status,
+        "╔══════════════════════════╗\n║  HIDDEN VEHICLE  + by ANHDEPZAI 🇻🇳     ║\n╚══════════════════════════╝\n" .. status
     )
     
     local choice = gg.choice(menuItems, 2025, title)
@@ -116,17 +121,25 @@ function MainMenu()
         ReplaceHiddenVehicle("SLED")
     elseif choice == 3 then
         ReplaceHiddenVehicle("TIRES")
-    elseif choice == 4 then
-        RestoreJeep()
+    -- Bỏ qua index 4 (dòng kẻ ngang, bấm vào sẽ tự động quay lại menu)
     elseif choice == 5 then
-        CheckGarageDetail()
+        RestoreJeep()
     elseif choice == 6 then
-        Config.language = not Config.language
-        gg.toast(Config.language and "Đã chuyển sang Tiếng Việt" or "Switched to English")
-        MainMenu()
+        CheckGarageDetail()
     elseif choice == 7 then
+        -- Đổi ngôn ngữ
+        Config.language = not Config.language
+        local langMsg = Config.language and "Đã chuyển sang Tiếng Việt 🇻🇳" or "Switched to English 🌐"
+        gg.toast(langMsg)
+        print("[Config] Ngôn ngữ hiện tại: " .. (Config.language and "Tiếng Việt" or "English"))
+        MainMenu()
+    elseif choice == 8 then
         gg.toast(L("Tạm biệt!", "Goodbye!"))
+        print("[Exit] Đã thoát script an toàn.")
         os.exit()
+    else
+        -- Phòng hờ nếu bấm nhầm vào dòng kẻ ngang [4]
+        MainMenu()
     end
 end
 
@@ -136,12 +149,13 @@ function CheckGarageDetail()
     local inGarage = checkGarage()
     
     if inGarage then
-        -- Đếm số xe có thể thấy
         gg.clearResults()
         gg.setRanges(Config.baseRegion)
-        gg.searchNumber("h 9A 99 09 40 00 00 00 00 0E 53 43 4F 4F 54 45 52", 1)  -- float 2.4 + "SCOOTER"
+        gg.searchNumber("h 9A 99 09 40 00 00 00 00 0E 53 43 4F 4F 54 45 52", 1)  
         local jeepCount = gg.getResultsCount()
         gg.clearResults()
+        
+        print("[CheckGarageDetail] Số lượng Jeep tìm thấy trong bộ nhớ: " .. jeepCount)
         
         gg.alert(
             L(
@@ -159,6 +173,7 @@ function CheckGarageDetail()
             L("OK", "OK")
         )
     else
+        print("[CheckGarageDetail] Cảnh báo: Không tìm thấy Garage trong bộ nhớ.")
         local answer = gg.alert(
             L(
                 "⚠️ Không tìm thấy Garage!\n\n" ..
@@ -193,22 +208,21 @@ end
 -- ==================== HÀM CHÍNH: THAY THẾ XE ====================
 
 function ReplaceHiddenVehicle(vehicleType)
-    -- Bước 1: Xác định pattern theo loại xe
     local vehicleConfig = {
         SKIS = {
-            pattern = 'h 12 53 4E 4F 57 42 4F 41 52 44 00',  -- "SNOWBOARD"
-            checkValue = 1077936128,  -- float 3.0
+            pattern = 'h 12 53 4E 4F 57 42 4F 41 52 44 00',  
+            checkValue = 1077936128,  
             name = L("Ván trượt tuyết", "Skis"),
             searchTerm = "SNOWBOARD"
         },
         SLED = {
-            pattern = 'h 08 53 4C 45 44 00',  -- "SLED"
+            pattern = 'h 08 53 4C 45 44 00',  
             checkValue = 1077936128,
             name = L("Xe trượt tuyết", "Sled"),
             searchTerm = "SLED"
         },
         TIRES = {
-            pattern = 'h 10 44 4F 55 47 48 4E 55 54 00',  -- "DOUGHNUT"
+            pattern = 'h 10 44 4F 55 47 48 4E 55 54 00',  
             checkValue = 1077936128,
             name = L("Lốp tuyết", "Snow Tires"),
             searchTerm = "DOUGHNUT"
@@ -222,12 +236,14 @@ function ReplaceHiddenVehicle(vehicleType)
     end
     
     gg.toast(L("Đang tìm " .. cfg.name .. "...", "Searching for " .. cfg.name .. "..."))
+    print("[Replace] Đang tìm kiếm xe ẩn: " .. cfg.searchTerm)
     
-    -- Bước 2: Tìm struct xe ẩn
     gg.clearResults()
     gg.setRanges(Config.baseRegion)
     gg.searchNumber(cfg.pattern, 1)
     local structResults = gg.getResults(gg.getResultsCount())
+    
+    print("[Replace] Số kết quả cấu trúc " .. cfg.searchTerm .. " tìm thấy: " .. #structResults)
     
     if #structResults == 0 then
         gg.alert(
@@ -250,7 +266,6 @@ function ReplaceHiddenVehicle(vehicleType)
         return MainMenu()
     end
     
-    -- Bước 3: Xác định pointer của xe ẩn
     local hiddenVehiclePointer = nil
     for i, v in ipairs(structResults) do
         local checkVal = gg.getValues({{address = v.address - 0x8, flags = 4}})[1].value
@@ -261,6 +276,7 @@ function ReplaceHiddenVehicle(vehicleType)
     end
     
     if not hiddenVehiclePointer then
+        print("[Replace] Lỗi: Tìm thấy chuỗi nhưng không khớp checkValue cấu trúc.")
         gg.alert(
             L(
                 "❌ Không tìm thấy pointer của " .. cfg.name .. "!\n" ..
@@ -275,16 +291,17 @@ function ReplaceHiddenVehicle(vehicleType)
         return MainMenu()
     end
     
+    print("[Replace] Pointer xe ẩn tìm thấy tại: 0x" .. string.format("%X", hiddenVehiclePointer))
     gg.toast(L("✅ Đã tìm thấy pointer xe ẩn: 0x" .. string.format("%X", hiddenVehiclePointer), 
                 "✅ Hidden vehicle pointer: 0x" .. string.format("%X", hiddenVehiclePointer)))
     
-    -- Bước 4: Tìm pointer Jeep gốc
     gg.clearResults()
     gg.setRanges(Config.baseRegion)
     gg.searchNumber("h 9A 99 09 40 00 00 00 00 0E 53 43 4F 4F 54 45 52", 1)
     local jeepResults = gg.getResults(1)
     
     if #jeepResults == 0 then
+        print("[Replace] Lỗi: Không tìm thấy địa chỉ Jeep gốc.")
         gg.alert(
             L(
                 "❌ Không tìm thấy Jeep gốc!\n" ..
@@ -298,8 +315,8 @@ function ReplaceHiddenVehicle(vehicleType)
     end
     
     local jeepBaseAddress = jeepResults[1].address
+    print("[Replace] Jeep base address: 0x" .. string.format("%X", jeepBaseAddress))
     
-    -- Bước 5: Tìm mảng pointer xe
     gg.clearResults()
     gg.setRanges(Config.baseRegion)
     gg.searchNumber(jeepBaseAddress - 0x18, 32)
@@ -315,6 +332,7 @@ function ReplaceHiddenVehicle(vehicleType)
     end
     
     if not vehicleArrayPointer then
+        print("[Replace] Lỗi: Không tìm thấy mảng pointer xe (vehicleArrayPointer).")
         local answer = gg.alert(
             L(
                 "❌ Không tìm thấy mảng pointer xe!\n\n" ..
@@ -344,21 +362,21 @@ function ReplaceHiddenVehicle(vehicleType)
         return
     end
     
-    -- Bước 6: Đọc giá trị pointer Jeep
+    print("[Replace] Vehicle array pointer: 0x" .. string.format("%X", vehicleArrayPointer))
     local jeepPointerValue = gg.getValues({{address = vehicleArrayPointer, flags = 4}})[1].value
     
-    -- Bước 7: Tìm TẤT CẢ vị trí có giá trị này
     gg.clearResults()
     gg.setRanges(Config.baseRegion)
     gg.searchNumber(jeepPointerValue, 4)
     local allPointers = gg.getResults(gg.getResultsCount())
+    
+    print("[Replace] Tổng số pointer Jeep cần sửa: " .. #allPointers)
     
     if #allPointers == 0 then
         gg.alert(L("❌ Không tìm thấy pointer Jeep nào!", "❌ No Jeep pointers found!"))
         return MainMenu()
     end
     
-    -- Bước 8: Hiển thị xác nhận
     local confirm = gg.alert(
         L(
             "🔄 XÁC NHẬN THAY THẾ\n\n" ..
@@ -386,7 +404,6 @@ function ReplaceHiddenVehicle(vehicleType)
         return MainMenu()
     end
     
-    -- Bước 9: Ghi đè pointer
     local modifyTable = {}
     for i, ptr in ipairs(allPointers) do
         table.insert(modifyTable, {
@@ -396,11 +413,11 @@ function ReplaceHiddenVehicle(vehicleType)
         })
     end
     
-    local success = pcall(gg.setValues, modifyTable)
-    
+    local success, err = pcall(gg.setValues, modifyTable)
     gg.clearResults()
     
     if success then
+        print("[Replace] Ghi đè thành công " .. #modifyTable .. " pointer sang " .. cfg.searchTerm)
         gg.alert(
             L(
                 "✅ THÀNH CÔNG!\n\n" ..
@@ -423,6 +440,7 @@ function ReplaceHiddenVehicle(vehicleType)
             L("OK", "OK")
         )
     else
+        print("[Replace] Lỗi ghi bộ nhớ: " .. tostring(err))
         gg.alert(
             L("❌ Ghi bộ nhớ thất bại!\nCó thể do quyền root hoặc game chặn.", 
                 "❌ Memory write failed!\nRoot permission or game protection issue."),
@@ -461,6 +479,7 @@ function RestoreJeep()
     )
     
     if confirm == 1 then
+        print("[Restore] Người dùng chọn thoát game hoàn toàn.")
         gg.alert(
             L(
                 "👉 Hướng dẫn:\n" ..
@@ -480,7 +499,7 @@ function RestoreJeep()
         )
         os.exit()
     elseif confirm == 2 then
-        -- Tự động khôi phục: tìm tất cả struct xe ẩn và tìm Jeep gốc
+        print("[Restore] Bắt đầu quá trình tự động khôi phục...")
         gg.toast(L("Đang tìm Jeep gốc...", "Searching for original Jeep..."))
         
         gg.clearResults()
@@ -489,6 +508,7 @@ function RestoreJeep()
         local jeepResults = gg.getResults(1)
         
         if #jeepResults == 0 then
+            print("[Restore] Lỗi: Không tìm thấy Jeep gốc.")
             gg.alert(
                 L(
                     "❌ Không tìm thấy Jeep gốc!\n" ..
@@ -517,6 +537,7 @@ function RestoreJeep()
         end
         
         if not vehicleArrayPointer then
+            print("[Restore] Lỗi: Không tìm thấy mảng pointer khôi phục.")
             gg.alert(
                 L(
                     "❌ Không tìm thấy mảng pointer!\n" ..
@@ -529,15 +550,12 @@ function RestoreJeep()
             return MainMenu()
         end
         
-        -- Ghi lại pointer Jeep gốc
-        local jeepPointerValue = gg.getValues({{address = vehicleArrayPointer, flags = 4}})[1].value
-        
-        -- Nếu giá trị đã bị đổi, tìm struct Jeep
         gg.clearResults()
         gg.searchNumber(jeepBaseAddress - 0x18, 32)
         local jeepStructPointers = gg.getResults(gg.getResultsCount())
         
         if #jeepStructPointers == 0 then
+            print("[Restore] Lỗi: Không tìm thấy struct Jeep.")
             gg.alert(
                 L(
                     "❌ Không tìm thấy struct Jeep!\n" ..
@@ -550,7 +568,6 @@ function RestoreJeep()
             return MainMenu()
         end
         
-        -- Khôi phục: ghi đè pointer về Jeep gốc
         local restoreTable = {}
         for i, p in ipairs(jeepStructPointers) do
             local ptrAddr = p.address - 0x8
@@ -566,6 +583,7 @@ function RestoreJeep()
         if #restoreTable > 0 then
             local success = pcall(gg.setValues, restoreTable)
             if success then
+                print("[Restore] Khôi phục thành công " .. #restoreTable .. " pointer.")
                 gg.alert(
                     L(
                         "✅ Đã khôi phục " .. #restoreTable .. " pointer!\n\n" ..
@@ -578,6 +596,7 @@ function RestoreJeep()
                     L("OK", "OK")
                 )
             else
+                print("[Restore] Ghi đè khôi phục thất bại.")
                 gg.alert(
                     L("❌ Khôi phục thất bại!\nVui lòng thoát game.", 
                         "❌ Restore failed!\nPlease exit game."),
@@ -585,6 +604,7 @@ function RestoreJeep()
                 )
             end
         else
+            print("[Restore] Không tìm thấy pointer nào cần khôi phục.")
             gg.alert(
                 L("⚠️ Không có gì để khôi phục.", "⚠️ Nothing to restore."),
                 L("OK", "OK")
@@ -600,8 +620,9 @@ end
 
 -- ==================== CHẠY SCRIPT ====================
 
--- Kiểm tra game version (cảnh báo nhẹ)
 local versionName = gg.getTargetInfo().versionName or "Unknown"
+print("[Init] Phiên bản game hiện tại: " .. versionName)
+
 if versionName ~= "1.76.0" then
     local answer = gg.alert(
         L(
@@ -618,6 +639,7 @@ if versionName ~= "1.76.0" then
         L("Thoát", "Exit")
     )
     if answer ~= 1 then
+        print("[Init] Người dùng đã hủy do lệch phiên bản game.")
         os.exit()
     end
 end
