@@ -1,3 +1,3 @@
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0ea5e9,50:6366f1,100:ec4899&height=175&section=header&text=ANHDEPZAI&fontSize=64&fontColor=ffffff&fontAlignY=38&desc=Developer%20%7C%20Scripter%20%7C%20Vietnam&descAlignY=64&descSize=17" width="100%" />
-</div>
+​<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0ea5e9,50:6366f1,100:ec4899&height=175&section=header&text=ANHDEPZAI&fontSize=64&fontColor=ffffff&fontAlignY=38&desc=Developer%20%7C%20Scripter%20%7C%20Vietnam&descAlignY=64&descSize=17" width="100%" />
+​<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=19&duration=2200&pause=500&color=38BDF8&center=true&vCenter=true&width=520&height=40&lines=LOADING+ANHDEPZAI...;INITIALIZING+CORE+MODULES...;STATUS:+ONLINE+%E2%9C%94" alt="Loading animation" />
